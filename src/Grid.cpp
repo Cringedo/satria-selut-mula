@@ -54,7 +54,7 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
     if (tile)
     {
         Rectangle rect = tile->GetRectangle();
-        player.SetPosition(rect.x, rect.y);
+        player.SetPosition(rect.x, rect.y-rect.height/2.0f); 
         player.SetGridPosition(i, j);
     }
 }
