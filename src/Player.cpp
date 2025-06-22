@@ -1,4 +1,4 @@
-#include <Entity.hpp>
+#include <self/Entity.hpp>
 #include <raylib.h>
 
 using namespace std;
@@ -11,8 +11,6 @@ string Player::UpdateName() {
 
     if (IsKeyDown(KEY_RIGHT)) name = "abu";
     if (IsKeyDown(KEY_LEFT)) name = "paria";
-
-    TraceLog(LOG_INFO, "Player's name has been updated to %s", name);
 
     return name;
 }
