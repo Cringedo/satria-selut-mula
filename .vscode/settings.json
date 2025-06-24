@@ -66,5 +66,6 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "variant": "cpp"
-    }
+    },
+    "cmake.ignoreCMakeListsMissing": true
 }

@@ -2,6 +2,7 @@
 #include <self/Constant.h>
 #include <self/Grid.hpp>
 
+#include <string>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -10,7 +11,7 @@ using namespace std;
 Player::Player(float x, float y, string n) : position({x, y}), name(n)
 {
     TraceLog(LOG_INFO, "Player (%s) has been created at [%0.0f, %0.0f]", n, position.x, position.y);
-    Image image = LoadImage("sprites/tile.png");
+    Image image = LoadImage("sprites/player_template.png");
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 
@@ -47,8 +48,7 @@ void Player::SetPositionByIso(float x, float y)
 
 void Player::Draw()
 {
-    // DrawTexture(texture, positionY, positionY, RED);
-    DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
+    DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
 }
 
 Vector2 Player::GetPosition()

@@ -10,7 +10,7 @@
 // ======================
 // GRID
 
-Grid::Grid(int height, int width) : height(10), width(10)
+Grid::Grid(int height, int width) : height(height), width(width)
 {
     Image image = LoadImage("sprites/tile.png");
     texture = LoadTextureFromImage(image);
