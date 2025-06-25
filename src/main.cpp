@@ -19,7 +19,7 @@ int main()
 
     SetTargetFPS(180);
 
-    Grid grid = Grid(15, 15);
+    Grid grid = Grid(12, 12);
     grid.Generate();
 
     Player player = Player(1, 1, "Nabil");
@@ -52,6 +52,10 @@ int main()
         {
             grid.PlacePlayerByGridCoordinate(player, player.GetGridCoordinate().x, player.GetGridCoordinate().y - 1);
         }
+        if (IsKeyPressed(KEY_Z))
+        {
+            grid.Generate();
+        }
         // ======================================
         // Draw
         BeginDrawing();
@@ -60,6 +64,7 @@ int main()
         player.Draw();
 
         panel.Draw();
+        Panel(100, 200).Draw();
 
         DisplayDebug(player);
 

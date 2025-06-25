@@ -6,6 +6,9 @@ Panel::Panel(Rectangle rect) : rect(rect)
 {
 }
 
+Panel::Panel(float x, float y): Panel({x, y, 100, 100})
+{
+}
 void Panel::SetHeight(float h)
 {
     height = h;
