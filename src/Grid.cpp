@@ -2,6 +2,7 @@
 #include <self/Entity.hpp>
 #include <self/Constant.h>
 #include <self/FastNoiseLite.h>
+// #include <self/GameObject.hpp>
 
 #include <raylib.h>
 #include <raymath.h>
@@ -31,7 +32,7 @@ std::pair<int, int> Grid::GetSize()
 }
 
 void Grid::Generate()
-{   
+{
     tiles.clear();
 
     TraceLog(LOG_INFO, "Starting: Generate the grids");
@@ -43,15 +44,16 @@ void Grid::Generate()
 
     // This is assign the tile based on the coordinate
     Vector3 temp;
-    Tile tile = Tile({}, {}, {});
+    Tile tile = Tile({}, {});
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
             temp = Vector3Transform({(float)i * scale, (float)j * scale, 1}, toIso);
-            float noiseValue = noise.GetNoise((float)i, (float)j)*10;
+            float noiseValue = noise.GetNoise((float)i, (float)j) * 10;
 
-            tile = Tile({temp.x, temp.y, scale, scale}, {(float)i, (float)j}, noiseValue);
+            tile = Tile({temp.x, temp.y, scale, scale}, noiseValue);
+            tile.SetGridCoordinate({(float)i, (float)j});
             tiles.push_back(tile);
         }
     }
@@ -89,12 +91,19 @@ void Grid::Draw()
     for (const Tile &tile : tiles)
     {
         // TraceLog(LOG_INFO, TextFormat("Tile %f, %f - %f", tile.GetRectangle().x, tile.GetRectangle().y, tile.GetNoiseValue()));
-        if (tile.GetNoiseValue() > 4){
-            // DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, RED);  
+        if (tile.GetNoiseValue() > 4)
+        {
+            // DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, RED);
             continue;
         }
-        else{
-            DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, WHITE);  
+        else
+        {
+            DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, WHITE);
+            // TODO: expand on this!
+            if (CheckCollisionPointRec(GetMousePosition(),tile.GetRectangle()))
+            {
+                DrawText("Mouse over tile!", 10, 70, 20, BLUE);
+            }
         }
     }
 }
@@ -102,8 +111,11 @@ void Grid::Draw()
 // ======================
 // TILE
 
-Tile::Tile(Rectangle rectangle, Vector2 gridCoordinate, float noiseValue) : rectangle(rectangle), gridCoordinate(gridCoordinate), noiseValue(noiseValue)
+Tile::Tile(Rectangle rectangle, float noiseValue) : rectangle(rectangle), noiseValue(noiseValue), GameObject({})
 {
+    SetIsoCoordinate(rectangle);
+    SetGridCoordinate(gridCoordinate);
+    // TraceLog(LOG_INFO, "Comparison: %f,%f = %f,%f", rectangle.x, rectangle.y, GetIsoCoordinate().x, GetIsoCoordinate().y);
     // TraceLog(LOG_INFO, "Instantiate tile Rect: [%0.0f,%0.0f] Coordinate: [%0.0f,%0.0f]", rectangle.x, rectangle.y, gridCoordinate.x, gridCoordinate.y);
 }
 

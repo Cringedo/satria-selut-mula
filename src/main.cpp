@@ -4,6 +4,9 @@
 #include <self/Panel.hpp>
 
 #include <self/Constant.h>
+
+#include<raymath.h>
+
 using namespace std;
 
 void DisplayDebug(Player player);
