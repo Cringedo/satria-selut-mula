@@ -31,8 +31,6 @@ int main()
     grid.PlacePlayerByGridCoordinate(player, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
     PLAYER_GRID_COORDINATE = player.GetGridCoordinate();
 
-    Panel panel = Panel({0, 100, 200, 100});
-
     // Main game loop
     while (!w.ShouldClose()) // Detect window close button or ESC key
     {

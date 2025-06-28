@@ -39,7 +39,7 @@ void Player::SetPosition(float x, float y)
     position = {x, y};
     SetGridCoordinate(position);
 
-    TraceLog(LOG_WARNING, "This position is at %0.0f, %0.0f", x, y);
+    // TraceLog(LOG_WARNING, "This position is at %0.0f, %0.0f", x, y);
 
     dest = {x, y, SCALE, SCALE};
 }

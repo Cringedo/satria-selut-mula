@@ -5,6 +5,5 @@
 Vector2 PLAYER_GRID_COORDINATE = {0.0f, 0.0f};
 float PLAYER_DAMAGE = 1.0f;
 float PLAYER_RANGE = 1.0f;
-// ---------------------------------------
 
-// No other code in this file usually, unless it's specific to global initializations.
+int PLAYER_LEVEL = 1;

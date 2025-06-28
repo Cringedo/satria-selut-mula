@@ -74,6 +74,11 @@ void Grid::Generate()
             }
         }
     }
+
+    // Handling object spawn
+    for (Vector2 &v : safeTiles){
+
+    }
 }
 
 void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
@@ -122,13 +127,13 @@ Vector2 Grid::GetRandomSafeTile()
 
 Tile *Grid::GetTileByGridCoordinate(int i, int j)
 {
-    TraceLog(LOG_INFO, "Coordinate New Player Position[%0.0f,%0.0f]", (float)i, (float)j);
+    // TraceLog(LOG_INFO, "Coordinate New Player Position[%0.0f,%0.0f]", (float)i, (float)j);
     for (Tile &tile : tiles)
     {
         // TraceLog(LOG_INFO, "Coordinate [%0.0f,%0.0f]", tile.GetGridCoordinate().x, tile.GetGridCoordinate().y);
         if (tile.GetGridCoordinate().x == float(i) && tile.GetGridCoordinate().y == float(j))
         {
-            TraceLog(LOG_INFO, "Found the exact coordinate at Tile[%0.0f,%0.0f]-[%0.0f,%0.0f]", tile.GetGridCoordinate().x, tile.GetGridCoordinate().y, float(i), float(j));
+            // TraceLog(LOG_INFO, "Found the exact coordinate at Tile[%0.0f,%0.0f]-[%0.0f,%0.0f]", tile.GetGridCoordinate().x, tile.GetGridCoordinate().y, float(i), float(j));
             return &tile;
         }
     }
@@ -197,7 +202,7 @@ void DisplayTileDetails(Tile tile)
 }
 
 // ======================
-// TILE
+// TILE Section
 
 Tile::Tile(Rectangle rectangle, float noiseValue) : rectangle(rectangle), noiseValue(noiseValue), GameObject({})
 {
