@@ -76,11 +76,20 @@ void Grid::Generate()
     }
 
     // Handling object spawn
-    for (Vector2 &v : safeTiles){
+    // for (Vector2 &v : safeTiles){
 
+    // }
+}
+void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
+{
+    Tile *tile = GetTileByGridCoordinate(i, j);
+    if (tile)
+    {
+        Rectangle rect = tile->GetRectangle();
+        entity.SetPosition(rect.x, rect.y - rect.height / 2.0f);
+        entity.SetGridPosition(i, j);
     }
 }
-
 void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 {
     Tile *tile = GetTileByGridCoordinate(i, j);
@@ -91,6 +100,7 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
         player.SetGridPosition(i, j);
     }
 }
+
 
 bool CheckForTile(Vector2 coord)
 {
@@ -109,16 +119,16 @@ bool CheckForTile(Vector2 coord)
 Vector2 Grid::GetRandomSafeTile()
 {
     bool safeSpawn = false;
-    int randomX = std::rand() % width;
-    int randomY = std::rand() % height;
+    int randomX = std::rand() % GRID_WIDTH;
+    int randomY = std::rand() % GRID_HEIGHT;
 
     while (!safeSpawn)
     {
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         safeSpawn = CheckForTile({(float)randomX, (float)randomY});
 
-        randomX = std::rand() % width;
-        randomY = std::rand() % height;
+        randomX = std::rand() % GRID_WIDTH;
+        randomY = std::rand() % GRID_HEIGHT;
     }
 
     TraceLog(LOG_INFO, "!!!Spawning at [%d, %d]", randomX, randomY);

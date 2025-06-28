@@ -1,87 +1,42 @@
 #include <raylib-cpp.hpp>
-#include <self/Entity.hpp>
-#include <self/Grid.hpp>
-#include <self/Panel.hpp>
+#include <self/GameManger.hpp> 
+#include <self/Constant.h>    
 
-#include <self/Constant.h>
-
-#include <raymath.h>
-
-using namespace std;
-
-void DisplayDebug(Player player);
+// Your DisplayDebug will need to access GameManager's player, or be passed it
+extern void DisplayDebug(const Player& player); // Declare, definition likely elsewhere
 
 int main()
 {
+    raylib::Window w(windowSize[0], windowSize[1], "Satria Selut");
+    SetTargetFPS(60); 
 
-    int screenWidth = windowSize[0];
-    int screenHeight = windowSize[1];
-
-    raylib::Color textColor(LIGHTGRAY);
-    raylib::Window w(screenWidth, screenHeight, "Raylib C++ Starter Kit Example");
-
-    SetTargetFPS(180);
-
-    Grid grid = Grid(12, 12);
-    grid.Generate();
-
-    Player player = Player(1, 1, "Nabil");
-    Vector2 playerSpawnCoordinate = grid.GetRandomSafeTile();
-
-    grid.PlacePlayerByGridCoordinate(player, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
-    PLAYER_GRID_COORDINATE = player.GetGridCoordinate();
+    // Initialize the GameManager
+    GameManager::GetInstance().Init();
 
     // Main game loop
-    while (!w.ShouldClose()) // Detect window close button or ESC key
+    while (!w.ShouldClose()) 
     {
-        // ======================================
-        // Update
+        float deltaTime = GetFrameTime(); 
 
-        if (IsKeyPressed(KEY_RIGHT))
-        {
-            grid.PlacePlayerByGridCoordinate(player, player.GetGridCoordinate().x + 1, player.GetGridCoordinate().y);
-        }
-        if (IsKeyPressed(KEY_LEFT))
-        {
-            grid.PlacePlayerByGridCoordinate(player, player.GetGridCoordinate().x - 1, player.GetGridCoordinate().y);
-        }
-        if (IsKeyPressed(KEY_UP))
-        {
-            grid.PlacePlayerByGridCoordinate(player, player.GetGridCoordinate().x, player.GetGridCoordinate().y + 1);
-        }
-        if (IsKeyPressed(KEY_DOWN))
-        {
-            grid.PlacePlayerByGridCoordinate(player, player.GetGridCoordinate().x, player.GetGridCoordinate().y - 1);
-        }
-        if (IsKeyPressed(KEY_Z))
-        {
-            grid.Generate();
-            playerSpawnCoordinate = grid.GetRandomSafeTile();
-            grid.PlacePlayerByGridCoordinate(player, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
-        }
+        // Update logic delegated to GameManager
+        GameManager::GetInstance().Update(deltaTime);
 
-        PLAYER_GRID_COORDINATE = player.GetGridCoordinate();
-        // TraceLog(LOG_INFO, "PLAYER IS AT [%f, %f]", PLAYER_GRID_COORDINATE.x, PLAYER_GRID_COORDINATE.y);
-        // ======================================
-        // Draw
+        // Drawing logic delegated to GameManager
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-        grid.Draw();
-        player.Draw();
+        ClearBackground(RAYWHITE); // Clear screen first
+        GameManager::GetInstance().Draw(); // Let GameManager handle drawing based on state
 
-        DisplayDebug(player);
+        // You might still call DisplayDebug here if it's a global overlay,
+        // or integrate it into GameManager::Draw's PLAYING state
+        // if (GameManager::GetInstance().GetCurrentState() == GameState::PLAYING) {
+        //     DisplayDebug(*(GameManager::GetInstance().GetPlayer())); // Pass player from GameManager
+        // }
 
         EndDrawing();
     }
 
+    GameManager::GetInstance().Shutdown();
+    CloseWindow();
+
     return 0;
-}
-
-void DisplayDebug(Player player)
-{
-    const char *debugString;
-
-    debugString = TextFormat("Player Position: (%.2f, %.2f)", player.GetGridCoordinate().x, player.GetGridCoordinate().y);
-
-    DrawText(debugString, 1, 1, 32, BLACK);
 }
