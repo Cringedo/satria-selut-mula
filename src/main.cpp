@@ -5,7 +5,7 @@
 
 #include <self/Constant.h>
 
-#include<raymath.h>
+#include <raymath.h>
 
 using namespace std;
 
@@ -26,9 +26,10 @@ int main()
     grid.Generate();
 
     Player player = Player(1, 1, "Nabil");
-    string updatedText = player.UpdateName();
+    Vector2 playerSpawnCoordinate = grid.GetRandomSafeTile();
 
-    grid.PlacePlayerByGridCoordinate(player, 0, 0);
+    grid.PlacePlayerByGridCoordinate(player, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
+    PLAYER_GRID_COORDINATE = player.GetGridCoordinate();
 
     Panel panel = Panel({0, 100, 200, 100});
 
@@ -38,7 +39,6 @@ int main()
         // ======================================
         // Update
 
-        updatedText = "Hello " + player.UpdateName() + "!";
         if (IsKeyPressed(KEY_RIGHT))
         {
             grid.PlacePlayerByGridCoordinate(player, player.GetGridCoordinate().x + 1, player.GetGridCoordinate().y);
@@ -58,16 +58,18 @@ int main()
         if (IsKeyPressed(KEY_Z))
         {
             grid.Generate();
+            playerSpawnCoordinate = grid.GetRandomSafeTile();
+            grid.PlacePlayerByGridCoordinate(player, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
         }
+
+        PLAYER_GRID_COORDINATE = player.GetGridCoordinate();
+        // TraceLog(LOG_INFO, "PLAYER IS AT [%f, %f]", PLAYER_GRID_COORDINATE.x, PLAYER_GRID_COORDINATE.y);
         // ======================================
         // Draw
         BeginDrawing();
         ClearBackground(RAYWHITE);
         grid.Draw();
         player.Draw();
-
-        panel.Draw();
-        Panel(100, 200).Draw();
 
         DisplayDebug(player);
 
@@ -79,8 +81,8 @@ int main()
 
 void DisplayDebug(Player player)
 {
-    const char* debugString;
-    
+    const char *debugString;
+
     debugString = TextFormat("Player Position: (%.2f, %.2f)", player.GetGridCoordinate().x, player.GetGridCoordinate().y);
 
     DrawText(debugString, 1, 1, 32, BLACK);

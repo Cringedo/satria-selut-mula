@@ -1,4 +1,5 @@
-#include <self/Entity.hpp>
+#include <self/GameObject.hpp>
+// #include <self/Entity.hpp>
 #include <self/Constant.h>
 #include <self/Grid.hpp>
 
@@ -8,7 +9,7 @@
 
 using namespace std;
 
-Player::Player(float x, float y, string n) : position({x, y}), name(n)
+Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity({}) 
 {
     TraceLog(LOG_INFO, "Player (%s) has been created at [%0.0f, %0.0f]", n, position.x, position.y);
     Image image = LoadImage("sprites/player_template.png");
@@ -20,7 +21,12 @@ Player::Player(float x, float y, string n) : position({x, y}), name(n)
     source.x = 0;
     source.y = 0;
 
-    dest = {position.x, position.y, scale, scale};
+    dest = {position.x, position.y, SCALE, SCALE};
+    SetIsoCoordinate(dest);
+
+    setRange(1);
+    setHealth(5);
+    setDamage(1);
 }
 
 void Player::SetGridPosition(float x, float y)
@@ -31,19 +37,21 @@ void Player::SetGridPosition(float x, float y)
 void Player::SetPosition(float x, float y)
 {
     position = {x, y};
+    SetGridCoordinate(position);
 
     TraceLog(LOG_WARNING, "This position is at %0.0f, %0.0f", x, y);
 
-    dest = {x, y, scale, scale};
+    dest = {x, y, SCALE, SCALE};
 }
 
 void Player::SetPositionByIso(float x, float y)
 {
     position = {x, y};
 
-    Vector3 isoPosition = Vector3Transform({position.x * scale, position.y * scale, 1}, toIso);
+    Vector3 isoPosition = Vector3Transform({position.x * SCALE, position.y * SCALE, 1}, toIso);
 
-    dest = {isoPosition.x, isoPosition.y, scale, scale};
+    dest = {isoPosition.x, isoPosition.y, SCALE, SCALE};
+    SetIsoCoordinate(dest);
 }
 
 void Player::Draw()
@@ -59,15 +67,4 @@ Vector2 Player::GetPosition()
 Vector2 Player::GetGridCoordinate()
 {
     return gridCoordinate;
-}
-
-string Player::UpdateName()
-{
-
-    if (IsKeyDown(KEY_RIGHT))
-        name = "abu";
-    if (IsKeyDown(KEY_LEFT))
-        name = "paria";
-
-    return name;
 }
