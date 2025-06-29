@@ -92,11 +92,12 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
     }
 }
 
+// TODO: probably can use std::map to make this faster
 bool CheckForTile(Vector2 coord)
 {
     for (Vector2 &c : safeTiles)
     {
-        TraceLog(LOG_INFO, "Checking for [%f, %f] - [%f, %f]", coord.x, coord.y, c.x, c.y);
+        // TraceLog(LOG_INFO, "Checking for [%f, %f] - [%f, %f]", coord.x, coord.y, c.x, c.y);
         if (c.x == coord.x && c.y == coord.y)
         {
             return true;
@@ -109,16 +110,16 @@ bool CheckForTile(Vector2 coord)
 Vector2 Grid::GetRandomSafeTile()
 {
     bool safeSpawn = false;
-    int randomX = std::rand() % width;
-    int randomY = std::rand() % height;
+    int randomX = std::rand() % GRID_WIDTH;
+    int randomY = std::rand() % GRID_HEIGHT;
 
     while (!safeSpawn)
     {
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         safeSpawn = CheckForTile({(float)randomX, (float)randomY});
 
-        randomX = std::rand() % width;
-        randomY = std::rand() % height;
+        randomX = std::rand() % GRID_WIDTH;
+        randomY = std::rand() % GRID_HEIGHT;
     }
 
     TraceLog(LOG_INFO, "!!!Spawning at [%d, %d]", randomX, randomY);

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <raylib.h>
 
-#include <self/GameManger.hpp>
+#include <self/GameManager.hpp>
 #include <self/json.hpp>
 #include <self/Entity.hpp>
 #include <self/Grid.hpp>
@@ -34,6 +34,7 @@ void GameManager::Init()
     TraceLog(LOG_INFO, "GameManager: Initializing game systems...");
 
     // TODO: Initialise the load for the monster.json
+    LoadMonsterData("data/monster.json");
 
     // Initialize your managed game objects/systems
     playerPtr = std::make_unique<Player>(0, 0, "PlayerOne");
@@ -69,7 +70,6 @@ void GameManager::Update(float dt)
         }
         break;
     case GameState::PLAYING:
-        // Update all game entities and systems
         if (IsKeyPressed(KEY_RIGHT))
         {
             gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x+1, playerPtr->GetGridCoordinate().y);
@@ -86,7 +86,6 @@ void GameManager::Update(float dt)
         {
             gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y-1);
         }
-        // ... (add other movement keys)
 
         if (IsKeyPressed(KEY_Z))
         {
@@ -171,7 +170,7 @@ void GameManager::ChangeState(GameState newState)
     TraceLog(LOG_INFO, TextFormat("Game State Changed: %d", (int)newState));
 }
 
-bool GameManager::LoadMonsterData(string& filePath)
+bool GameManager::LoadMonsterData(const string& filePath)
 {
      std::ifstream file(filePath);
     if (!file.is_open()) {

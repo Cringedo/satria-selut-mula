@@ -1,5 +1,5 @@
 #include <raylib-cpp.hpp>
-#include <self/GameManger.hpp>
+#include <self/GameManager.hpp>
 #include <self/Constant.h>
 
 // Your DisplayDebug will need to access GameManager's player, or be passed it
