@@ -2,19 +2,16 @@
 #include <iostream> 
 #include <raylib.h> 
 
-// Include actual class definitions for managed objects if unique_ptr is used
 #include <self/Entity.hpp>
 #include <self/Grid.hpp>  
 #include <self/Constant.h>
 #include <self/FastNoiseLite.h>
 
-// Global/Static instance definition
 GameManager& GameManager::GetInstance() {
     static GameManager instance; 
     return instance;
 }
 
-// Private constructor
 GameManager::GameManager() : currentState(GameState::INTRO) { 
     TraceLog(LOG_INFO, "GameManager: Initializing...");
     SetRandomSeed(GetTime()); 
@@ -25,29 +22,23 @@ GameManager::~GameManager() {
 }
 
 void GameManager::Init() {
-    // Perform initial setup that happens once the game window is ready
     TraceLog(LOG_INFO, "GameManager: Initializing game systems...");
 
-    // Initialize raylib window here (usually in main, but can be managed by GameManager)
-    InitWindow(windowSize[0], windowSize[1], "My Game Title");
-    SetTargetFPS(60);
-
     // Initialize your managed game objects/systems
-    playerPtr = std::make_unique<Player>(0, 0, "PlayerOne"); // Initial arbitrary pos, will be set by grid
-    gridPtr = std::make_unique<Grid>(GRID_HEIGHT, GRID_WIDTH); // Using your global constants
-    gridPtr->Generate(); // Generate initial grid
+    playerPtr = std::make_unique<Player>(0, 0, "PlayerOne"); 
+    gridPtr = std::make_unique<Grid>(GRID_HEIGHT, GRID_WIDTH); 
+    gridPtr->Generate(); 
 
     // Place player at a random safe tile on the generated grid
     Vector2 playerSpawnCoordinate = gridPtr->GetRandomSafeTile();
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
-    PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); // Update global coordinate
+    PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); 
 
     // Change to the initial game state
-    ChangeState(GameState::MENU); // Or GameState::PLAYING if no menu
+    ChangeState(GameState::MENU); 
 }
 
 void GameManager::Update(float dt) {
-    // Main update logic based on current state
     switch (currentState) {
         case GameState::INTRO:
             // Update intro screen elements, check for input to proceed
@@ -63,7 +54,6 @@ void GameManager::Update(float dt) {
             break;
         case GameState::PLAYING:
             // Update all game entities and systems
-            // Input for Player movement (moved from main.cpp)
             if (IsKeyPressed(KEY_RIGHT)) {
                 playerPtr->SetGridPosition(playerPtr->GetGridCoordinate().x + 1, playerPtr->GetGridCoordinate().y);
                 gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y);
@@ -74,7 +64,6 @@ void GameManager::Update(float dt) {
             }
             // ... (add other movement keys)
 
-            // Example: Generate new grid on 'Z'
             if (IsKeyPressed(KEY_Z)) {
                 gridPtr->Generate();
                 Vector2 newSpawn = gridPtr->GetRandomSafeTile();
@@ -119,12 +108,10 @@ void GameManager::Draw() {
         case GameState::PLAYING:
             gridPtr->Draw();
             playerPtr->Draw();
-            // Call debug display here, passing playerPtr->get() if needed
-            // DisplayDebug(*playerPtr); // Assuming DisplayDebug exists and is updated
             break;
         case GameState::PAUSED:
             // Draw dimmed game state + pause overlay
-            gridPtr->Draw(); // Still draw game world under overlay
+            gridPtr->Draw(); 
             playerPtr->Draw();
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
             DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
@@ -139,18 +126,15 @@ void GameManager::Draw() {
 }
 
 void GameManager::Shutdown() {
-    // Perform cleanup before the game exits
     TraceLog(LOG_INFO, "GameManager: Shutting down game systems...");
-    // Smart pointers (unique_ptr) will handle their own destruction automatically.
-    // If you had raw pointers, you'd delete them here.
 }
 
 void GameManager::ChangeState(GameState newState) {
     if (newState == currentState) return; // No change needed
 
-    ExitState(currentState); // Perform exit actions for old state
-    currentState = newState; // Update state
-    EnterState(currentState); // Perform entry actions for new state
+    ExitState(currentState);
+    currentState = newState;
+    EnterState(currentState); 
 
     TraceLog(LOG_INFO, TextFormat("Game State Changed: %d", (int)newState));
 }
