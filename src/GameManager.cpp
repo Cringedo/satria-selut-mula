@@ -46,7 +46,14 @@ void GameManager::Init()
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
     PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate();
 
-    // TODO: Spawn mobs based on the safe tiles
+    // ----- Mobs Spawn -------
+    // TODO: do the proper spawning rate based on the player level
+    Vector2 monsterSpawnCoordinate;
+    monstersPtr.emplace_back(move(monstersTemplate[0]));
+    for (unique_ptr<Monster>& monster : monstersPtr){
+        monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
+        gridPtr->PlaceEntityByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
+    }
 
     ChangeState(GameState::MENU);
 }
@@ -72,19 +79,19 @@ void GameManager::Update(float dt)
     case GameState::PLAYING:
         if (IsKeyPressed(KEY_RIGHT))
         {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x+1, playerPtr->GetGridCoordinate().y);
+            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x + 1, playerPtr->GetGridCoordinate().y);
         }
         if (IsKeyPressed(KEY_LEFT))
         {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x-1, playerPtr->GetGridCoordinate().y);
+            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x - 1, playerPtr->GetGridCoordinate().y);
         }
         if (IsKeyPressed(KEY_UP))
         {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y+1);
+            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y + 1);
         }
         if (IsKeyPressed(KEY_DOWN))
         {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y-1);
+            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y - 1);
         }
 
         if (IsKeyPressed(KEY_Z))
@@ -136,11 +143,19 @@ void GameManager::Draw()
     case GameState::PLAYING:
         gridPtr->Draw();
         playerPtr->Draw();
+        for(unique_ptr<Monster>& monster : monstersPtr){
+            monster->Draw();
+        }
         break;
     case GameState::PAUSED:
         // Draw dimmed game state + pause overlay
         gridPtr->Draw();
         playerPtr->Draw();
+
+        for(unique_ptr<Monster>& monster : monstersPtr){
+            monster->Draw();
+        }
+        
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
         DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
         break;
@@ -170,23 +185,27 @@ void GameManager::ChangeState(GameState newState)
     TraceLog(LOG_INFO, TextFormat("Game State Changed: %d", (int)newState));
 }
 
-bool GameManager::LoadMonsterData(const string& filePath)
+bool GameManager::LoadMonsterData(const string &filePath)
 {
-     std::ifstream file(filePath);
-    if (!file.is_open()) {
+    std::ifstream file(filePath);
+    if (!file.is_open())
+    {
         cerr << "Error: Could not open JSON file: " << filePath << std::endl;
         return false;
     }
 
-    try {
+    try
+    {
         json data = json::parse(file);
 
-        if (!data.is_array()) {
+        if (!data.is_array())
+        {
             cerr << "Error: JSON root is not an array in " << filePath << std::endl;
             return false;
         }
 
-        for (const auto& monsterJson : data) {
+        for (const auto &monsterJson : data)
+        {
             string id = monsterJson.at("id").get<std::string>();
             string name = monsterJson.at("name").get<std::string>();
             int levelMin = monsterJson.at("levelMin").get<int>();
@@ -195,23 +214,33 @@ bool GameManager::LoadMonsterData(const string& filePath)
             float baseDamage = monsterJson.at("baseDamage").get<float>();
             int goldDrop = monsterJson.at("goldDrop").get<int>();
             float spawnWeight = monsterJson.at("spawnWeight").get<float>();
-
+            
             // Create Monster object and add to vector
             monstersTemplate.emplace_back(
-                id, name, levelMin, levelMax,
-                baseHealth, baseDamage, goldDrop, spawnWeight
+                make_unique<Monster>(
+                    id, name, levelMin, levelMax,
+                    baseHealth, baseDamage, goldDrop, spawnWeight
+                )
             );
-            
+
+            // monstersTemplate.emplace_back(
+            //     id, name, levelMin, levelMax,
+            //     baseHealth, baseDamage, goldDrop, spawnWeight
+            // );
+
             // Store a pointer to the newly added template monster
             monsterTemplateMap[id] = &monstersTemplate.back();
         }
         std::cout << "Successfully loaded " << monstersTemplate.size() << " monster templates from " << filePath << std::endl;
         return true;
-
-    } catch (const json::exception& e) {
+    }
+    catch (const json::exception &e)
+    {
         std::cerr << "JSON parse error in " << filePath << ": " << e.what() << std::endl;
         return false;
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         std::cerr << "Standard library error while parsing " << filePath << ": " << e.what() << std::endl;
         return false;
     }

@@ -4,6 +4,7 @@
 #include <self/FastNoiseLite.h>
 #include <self/GameObject.hpp>
 
+#include <iostream>
 #include <raylib.h>
 #include <raymath.h>
 #include <vector>
@@ -81,6 +82,20 @@ void Grid::Generate()
     }
 }
 
+// TODO: since it is entity -> monster class doesn't really cook
+void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
+{
+    Tile *tile = GetTileByGridCoordinate(i, j);
+    cout << entity.GetName() << endl;
+    TraceLog(LOG_INFO, "Monster %s  is spawning at [%d, %d]", entity.GetName(), i, j);
+    if (tile)
+    {
+        Rectangle rect = tile->GetRectangle();
+        entity.SetPosition(rect.x, rect.y - rect.height / 2.0f);
+        entity.SetGridPosition(i, j);
+    }
+}
+
 void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 {
     Tile *tile = GetTileByGridCoordinate(i, j);
@@ -128,7 +143,7 @@ Vector2 Grid::GetRandomSafeTile()
 
 Tile *Grid::GetTileByGridCoordinate(int i, int j)
 {
-    // TraceLog(LOG_INFO, "Coordinate New Player Position[%0.0f,%0.0f]", (float)i, (float)j);
+    TraceLog(LOG_INFO, "Coordinate an Entity Position[%0.0f,%0.0f]", (float)i, (float)j);
     for (Tile &tile : tiles)
     {
         // TraceLog(LOG_INFO, "Coordinate [%0.0f,%0.0f]", tile.GetGridCoordinate().x, tile.GetGridCoordinate().y);

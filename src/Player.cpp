@@ -3,6 +3,7 @@
 #include <self/Constant.h>
 #include <self/Grid.hpp>
 
+#include <iostream>
 #include <string>
 #include <raylib.h>
 #include <raymath.h>
@@ -37,9 +38,9 @@ void Player::SetGridPosition(float x, float y)
 void Player::SetPosition(float x, float y)
 {
     position = {x, y};
-    SetGridCoordinate(position);
+    // SetGridCoordinate(position);
 
-    // TraceLog(LOG_WARNING, "This position is at %0.0f, %0.0f", x, y);
+    TraceLog(LOG_WARNING, "This position is at %0.0f, %0.0f", x, y);
 
     dest = {x, y, SCALE, SCALE};
 }
@@ -67,5 +68,6 @@ Vector2 Player::GetGridCoordinate()
 //  ---- Draw -----
 void Player::Draw()
 {
+    cout << "--------- Player: " << dest.x << dest.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
 }

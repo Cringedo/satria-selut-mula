@@ -1,4 +1,7 @@
 #include <self/Entity.hpp>
+#include <self/Constant.h>
+
+#include <iostream>
 #include <algorithm>
 
 Monster::Monster(
@@ -19,6 +22,9 @@ Monster::Monster(
       goldDrop(goldDropVal),
       spawnWeight(spawnWeightVal)
 {
+    Image image = LoadImage("sprites/player_template.png"); // Temporary picture
+    texture = LoadTextureFromImage(image);
+    UnloadImage(image);
 }
 
 Monster::Monster(const Monster &other)
@@ -70,7 +76,31 @@ float Monster::calculateHealthAtLevel(int level) const
     return baseHealth + (clampedLevel - levelMin) * 10.0f;
 }
 
+void Monster::SetPosition(float x, float y)
+{
+    position = {x, y};
+    // SetGridCoordinate(position);
+
+    cout << "Test: " << x << ","  << y << endl;
+
+    dest = {x, y, SCALE, SCALE};
+}
+
+void Monster::SetPositionByIso(float x, float y)
+{
+    // TODO: use a proper ISO from Constant.h instead
+    position.x = x;
+    position.y = y;
+}
+
+void Monster::SetGridPosition(float x, float y)
+{
+    gridCoordinate.x = x;
+    gridCoordinate.y = y;
+}
+
 void Monster::Draw()
 {
+    cout << "--------- Monster: " << dest.x << dest.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
