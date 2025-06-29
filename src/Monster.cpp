@@ -1,7 +1,6 @@
 #include <self/Entity.hpp>
 #include <algorithm>
 
-// New constructor definition
 Monster::Monster(
     const std::string &idVal,
     const std::string &nameVal,
@@ -23,7 +22,7 @@ Monster::Monster(
 }
 
 Monster::Monster(const Monster &other)
-    : Entity(other), // Call base class copy constructor if Monster inherits from Entity
+    : Entity(other), 
       levelMin(other.levelMin), levelMax(other.levelMax),
       baseHealth(other.baseHealth), baseDamage(other.baseDamage),
       goldDrop(other.goldDrop), spawnWeight(other.spawnWeight)
