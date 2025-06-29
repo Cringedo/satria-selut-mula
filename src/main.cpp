@@ -13,7 +13,6 @@ void DisplayDebug(Player player);
 
 int main()
 {
-
     int screenWidth = windowSize[0];
     int screenHeight = windowSize[1];
 

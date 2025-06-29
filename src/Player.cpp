@@ -54,11 +54,6 @@ void Player::SetPositionByIso(float x, float y)
     SetIsoCoordinate(dest);
 }
 
-void Player::Draw()
-{
-    DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
-}
-
 Vector2 Player::GetPosition()
 {
     return position;
@@ -67,4 +62,10 @@ Vector2 Player::GetPosition()
 Vector2 Player::GetGridCoordinate()
 {
     return gridCoordinate;
+}
+
+//  ---- Draw -----
+void Player::Draw()
+{
+    DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
 }
