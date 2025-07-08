@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity({}) 
+Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity(n) 
 {
     TraceLog(LOG_INFO, "Player (%s) has been created at [%0.0f, %0.0f]", n, position.x, position.y);
     Image image = LoadImage("sprites/player_template.png");
@@ -68,7 +68,7 @@ Vector2 Player::GetGridCoordinate()
 //  ---- Draw -----
 void Player::Draw()
 {
-    cout << "--------- Player: " << dest.x << dest.y << endl;
-    cout << "Player (" << name << ") is at " << source.x << ", " << source.y << endl;
+    // cout << "--------- Player: " << dest.x << dest.y << endl;
+    // cout << "Player (" << name << ") is at " << source.x << ", " << source.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
 }

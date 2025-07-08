@@ -141,6 +141,24 @@ void GameManager::Update(float dt)
 
 void GameManager::Draw()
 {
+
+    std::vector<Entity *> drawableEntities;
+    drawableEntities.push_back(playerPtr.get());
+
+    for (const auto &monster : monstersPtr)
+    {
+        drawableEntities.push_back(monster.get());
+    }
+
+    // TODO:  sort the drawableEntities based on their grid coordinates
+    std::sort(drawableEntities.begin(), drawableEntities.end(),
+              [](const Entity *a, const Entity *b)
+              {
+                  return a->GetGridCoordinate().y < b->GetGridCoordinate().y ||
+                         (a->GetGridCoordinate().y == b->GetGridCoordinate().y &&
+                          a->GetGridCoordinate().x < b->GetGridCoordinate().x);
+              });
+
     // Drawing logic based on current state
     switch (currentState)
     {
@@ -153,25 +171,35 @@ void GameManager::Draw()
         break;
     case GameState::PLAYING:
         gridPtr->Draw();
-        playerPtr->Draw();
-        for (unique_ptr<Monster> &monster : monstersPtr)
+
+        // TODO: Draw player and monsters based on their grid coordinates
+        // ---------- Draw Player and Monsters ----------
+
+        for (Entity *entity : drawableEntities)
         {
-            // cout << "Drawing monster: " << monster->GetName() << endl;
-            monster->Draw();
+            // cout << "Drawing entity: " << entity->GetName() << endl;
+            entity->Draw();
         }
+
+        // for (unique_ptr<Monster> &monster : monstersPtr)
+        // {
+        //     // cout << "Drawing monster: " << monster->GetName() << endl;
+        //     monster->Draw();
+        // }
         break;
+
     case GameState::PAUSED:
         // Draw dimmed game state + pause overlay
-        gridPtr->Draw();
-        playerPtr->Draw();
+        // gridPtr->Draw();
+        // playerPtr->Draw();
 
-        for (unique_ptr<Monster> &monster : monstersPtr)
-        {
-            monster->Draw();
-        }
+        // for (unique_ptr<Monster> &monster : monstersPtr)
+        // {
+        //     monster->Draw();
+        // }
 
-        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
-        DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
+        // DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
+        // DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
         break;
     case GameState::GAMEOVER:
         DrawText("GAME OVER!", GetScreenWidth() / 2 - MeasureText("GAME OVER!", 60) / 2, GetScreenHeight() / 2 - 30, 60, RED);

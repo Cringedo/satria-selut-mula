@@ -113,7 +113,7 @@ void Monster::SetGridPosition(float x, float y)
 void Monster::Draw()
 {
     // cout << " texture: " << texture.id << " - " << texture.width << "x" << texture.height << endl;
-    cout << "--------- Monster: " << dest.x << "," << dest.y << endl;
-    cout << Entity::GetName() << " is at " << source.x << ", " << source.y << endl;
+    // cout << "--------- Monster: " << dest.x << "," << dest.y << endl;
+    // cout << Entity::GetName() << " is at " << source.x << ", " << source.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
