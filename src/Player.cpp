@@ -69,5 +69,6 @@ Vector2 Player::GetGridCoordinate()
 void Player::Draw()
 {
     cout << "--------- Player: " << dest.x << dest.y << endl;
+    cout << "Player (" << name << ") is at " << source.x << ", " << source.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
 }

@@ -46,13 +46,17 @@ void GameManager::Init()
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
     PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate();
 
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
     // ----- Mobs Spawn -------
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
     monstersPtr.emplace_back(move(monstersTemplate[0]));
-    for (unique_ptr<Monster>& monster : monstersPtr){
+    monstersPtr.emplace_back(move(monstersTemplate[1]));
+    for (unique_ptr<Monster> &monster : monstersPtr)
+    {
         monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
-        gridPtr->PlaceEntityByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
+        gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
     }
 
     ChangeState(GameState::MENU);
@@ -99,6 +103,13 @@ void GameManager::Update(float dt)
             gridPtr->Generate();
             Vector2 newSpawn = gridPtr->GetRandomSafeTile();
             gridPtr->PlacePlayerByGridCoordinate(*playerPtr, newSpawn.x, newSpawn.y);
+
+            Vector2 monsterSpawnCoordinate;
+            for (unique_ptr<Monster> &monster : monstersPtr)
+            {
+                monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
+                gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
+            }
         }
         PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); // Keep global in sync
 
@@ -143,7 +154,9 @@ void GameManager::Draw()
     case GameState::PLAYING:
         gridPtr->Draw();
         playerPtr->Draw();
-        for(unique_ptr<Monster>& monster : monstersPtr){
+        for (unique_ptr<Monster> &monster : monstersPtr)
+        {
+            // cout << "Drawing monster: " << monster->GetName() << endl;
             monster->Draw();
         }
         break;
@@ -152,10 +165,11 @@ void GameManager::Draw()
         gridPtr->Draw();
         playerPtr->Draw();
 
-        for(unique_ptr<Monster>& monster : monstersPtr){
+        for (unique_ptr<Monster> &monster : monstersPtr)
+        {
             monster->Draw();
         }
-        
+
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
         DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
         break;
@@ -214,14 +228,12 @@ bool GameManager::LoadMonsterData(const string &filePath)
             float baseDamage = monsterJson.at("baseDamage").get<float>();
             int goldDrop = monsterJson.at("goldDrop").get<int>();
             float spawnWeight = monsterJson.at("spawnWeight").get<float>();
-            
+
             // Create Monster object and add to vector
             monstersTemplate.emplace_back(
                 make_unique<Monster>(
                     id, name, levelMin, levelMax,
-                    baseHealth, baseDamage, goldDrop, spawnWeight
-                )
-            );
+                    baseHealth, baseDamage, goldDrop, spawnWeight));
 
             // monstersTemplate.emplace_back(
             //     id, name, levelMin, levelMax,

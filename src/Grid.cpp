@@ -97,6 +97,19 @@ void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
     }
 }
 
+void Grid::PlaceMonsterByGridCoordinate(Monster &monster, int i, int j)
+{
+    Tile *tile = GetTileByGridCoordinate(i, j);
+    cout << monster.GetName() << endl;
+    TraceLog(LOG_INFO, "Monster %s  is spawning at [%d, %d]", monster.GetName(), i, j);
+    if (tile)
+    {
+        Rectangle rect = tile->GetRectangle();
+        monster.SetPosition(rect.x, rect.y - rect.height / 2.0f);
+        monster.SetGridPosition(i, j);
+    }
+}
+
 void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 {
     Tile *tile = GetTileByGridCoordinate(i, j);
@@ -131,14 +144,13 @@ Vector2 Grid::GetRandomSafeTile()
 
     while (!safeSpawn)
     {
-        std::srand(static_cast<unsigned int>(std::time(nullptr)));
         safeSpawn = CheckForTile({(float)randomX, (float)randomY});
 
         randomX = std::rand() % GRID_WIDTH;
         randomY = std::rand() % GRID_HEIGHT;
     }
 
-    TraceLog(LOG_INFO, "!!!Spawning at [%d, %d]", randomX, randomY);
+    // TraceLog(LOG_INFO, "!!!Spawning at [%d, %d]", randomX, randomY);
     return {(float)randomX, (float)randomY};
 }
 

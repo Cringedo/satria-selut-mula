@@ -22,17 +22,28 @@ Monster::Monster(
       goldDrop(goldDropVal),
       spawnWeight(spawnWeightVal)
 {
-    Image image = LoadImage("sprites/player_template.png"); // Temporary picture
+    Image image = LoadImage("sprites/player_template.png");
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
+
+    source.x = 0;
+    source.y = 0;
+    source.width = (float)texture.width;
+    source.height = (float)texture.height;
+
+    cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << endl;
+    cout << texture.id << " - " << texture.width << "x" << texture.height << endl;
 }
 
 Monster::Monster(const Monster &other)
-    : Entity(other), 
+    : Entity(other),
       levelMin(other.levelMin), levelMax(other.levelMax),
       baseHealth(other.baseHealth), baseDamage(other.baseDamage),
       goldDrop(other.goldDrop), spawnWeight(other.spawnWeight)
 {
+    Image image = LoadImage("sprites/player_template.png"); // Temporary picture
+    texture = LoadTextureFromImage(image);
+    UnloadImage(image);
 }
 
 int Monster::getLevelMin() const
@@ -81,7 +92,7 @@ void Monster::SetPosition(float x, float y)
     position = {x, y};
     // SetGridCoordinate(position);
 
-    cout << "Test: " << x << ","  << y << endl;
+    cout << "Test: " << x << "," << y << endl;
 
     dest = {x, y, SCALE, SCALE};
 }
@@ -101,6 +112,8 @@ void Monster::SetGridPosition(float x, float y)
 
 void Monster::Draw()
 {
-    cout << "--------- Monster: " << dest.x << dest.y << endl;
+    // cout << " texture: " << texture.id << " - " << texture.width << "x" << texture.height << endl;
+    cout << "--------- Monster: " << dest.x << "," << dest.y << endl;
+    cout << Entity::GetName() << " is at " << source.x << ", " << source.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
