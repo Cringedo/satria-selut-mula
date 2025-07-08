@@ -83,6 +83,7 @@ void Grid::Generate()
 }
 
 // TODO: since it is entity -> monster class doesn't really cook
+// Cast as Monster instead?
 void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
 {
     Tile *tile = GetTileByGridCoordinate(i, j);
