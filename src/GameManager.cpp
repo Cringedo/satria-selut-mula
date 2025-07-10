@@ -152,12 +152,30 @@ void GameManager::Draw()
 
     // TODO:  sort the drawableEntities based on their grid coordinates
     std::sort(drawableEntities.begin(), drawableEntities.end(),
-              [](const Entity *a, const Entity *b)
+              [](Entity *a, Entity *b)
               {
-                  return a->GetGridCoordinate().y < b->GetGridCoordinate().y ||
-                         (a->GetGridCoordinate().y == b->GetGridCoordinate().y &&
-                          a->GetGridCoordinate().x < b->GetGridCoordinate().x);
+                //   cout << "Sorting entities by grid coordinate: " << a->GetName() << " vs " << b->GetName() << endl;
+                  return a->GetGridCoordinate().y > b->GetGridCoordinate().y;
               });
+    // // Display the current sorting of drawableEntities using DrawText
+    // int startY = 10;
+    // int fontSize = 18;
+    // int lineSpacing = 4;
+    // int x = 10;
+    // DrawText("Current drawableEntities order after sorting:", x, startY, fontSize, DARKGRAY);
+    // int y = startY + fontSize + lineSpacing;
+    // for (const auto *entity : drawableEntities)
+    // {
+    //     std::string info = entity->GetName() + " at (" +
+    //                        std::to_string(static_cast<int>(entity->GetGridCoordinate().x)) + ", " +
+    //                        std::to_string(static_cast<int>(entity->GetGridCoordinate().y)) + ")";
+    //     DrawText(info.c_str(), x, y, fontSize, GRAY);
+    //     y += fontSize + lineSpacing;
+    // }
+
+    //TODO: Issue could be because of drawableEntities->GetGridCoordinate() is not the same as the playerPtr->GetGridCoordinate() or monster->GetGridCoordinate()
+    cout << "Current drawableEntities[0]: " << std::to_string(static_cast<int>(drawableEntities[0]->GetGridCoordinate().x)) << ", " << std::to_string(static_cast<int>(drawableEntities[0]->GetGridCoordinate().y)) << endl;
+    cout << "Current player: " << std::to_string(static_cast<int>(playerPtr->GetGridCoordinate().x)) << ", " << std::to_string(static_cast<int>(playerPtr->GetGridCoordinate().y)) << endl;
 
     // Drawing logic based on current state
     switch (currentState)
@@ -177,7 +195,7 @@ void GameManager::Draw()
 
         for (Entity *entity : drawableEntities)
         {
-            // cout << "Drawing entity: " << entity->GetName() << endl;
+            // cout << "Drawing entity: " << drawableEntities[0]->GetName() << endl;
             entity->Draw();
         }
 

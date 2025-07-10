@@ -61,6 +61,11 @@ void Entity::SetPositionByIso(float x, float y)
     position.y = y;
 }
 
+Vector2 Entity::GetGridCoordinate() const
+{
+    return gridCoordinate;
+}
+
 void Entity::SetGridPosition(float x, float y)
 {
     gridCoordinate.x = x;
