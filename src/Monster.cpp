@@ -87,6 +87,11 @@ float Monster::calculateHealthAtLevel(int level) const
     return baseHealth + (clampedLevel - levelMin) * 10.0f;
 }
 
+Vector2 Monster::GetGridCoordinate() const
+{
+    return gridCoordinate;
+}
+
 void Monster::SetPosition(float x, float y)
 {
     position = {x, y};
