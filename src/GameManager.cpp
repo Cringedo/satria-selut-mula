@@ -81,22 +81,10 @@ void GameManager::Update(float dt)
         }
         break;
     case GameState::PLAYING:
-        if (IsKeyPressed(KEY_RIGHT))
-        {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x + 1, playerPtr->GetGridCoordinate().y);
-        }
-        if (IsKeyPressed(KEY_LEFT))
-        {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x - 1, playerPtr->GetGridCoordinate().y);
-        }
-        if (IsKeyPressed(KEY_UP))
-        {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y + 1);
-        }
-        if (IsKeyPressed(KEY_DOWN))
-        {
-            gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerPtr->GetGridCoordinate().x, playerPtr->GetGridCoordinate().y - 1);
-        }
+        if (IsKeyPressed(KEY_RIGHT)) MovePlayer(1, 0);
+        if (IsKeyPressed(KEY_LEFT))  MovePlayer(-1, 0);
+        if (IsKeyPressed(KEY_UP))    MovePlayer(0, 1);
+        if (IsKeyPressed(KEY_DOWN))  MovePlayer(0, -1);
 
         if (IsKeyPressed(KEY_Z))
         {
@@ -141,7 +129,6 @@ void GameManager::Update(float dt)
 
 void GameManager::Draw()
 {
-
     std::vector<Entity *> drawableEntities;
     drawableEntities.push_back(playerPtr.get());
 
@@ -150,14 +137,13 @@ void GameManager::Draw()
         drawableEntities.push_back(monster.get());
     }
 
-    // TODO:  sort the drawableEntities based on their grid coordinates
     std::sort(drawableEntities.begin(), drawableEntities.end(),
               [](Entity *a, Entity *b)
               {
                   return a->GetGridCoordinate().y < b->GetGridCoordinate().y;
               });
 
-    DrawEntityOrder(drawableEntities);
+    DisplayDrawEntityOrder(drawableEntities);
 
     // Drawing logic based on current state
     switch (currentState)
@@ -297,14 +283,18 @@ void GameManager::ExitState(GameState state)
     }
 }
 
-void GameManager::DrawEntityOrder(const std::vector<Entity *> &drawableEntities)
+void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEntities)
 {
-    // Draw the current order of drawable entities
+    int yOffset = 200; 
+    int gap = 20;
+
+    DrawText("Entity Draw Order:", 10, yOffset - 30, 20, BLACK);
+
     for (size_t i = 0; i < drawableEntities.size(); ++i)
     {
         const Entity *entity = drawableEntities[i];
         DrawText(TextFormat("%zu: %s", i, entity->GetName().c_str()),
-                 10, 10 + static_cast<int>(i) * 20, 20, BLACK);
+                 10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
     }
 }
 
@@ -314,4 +304,10 @@ void GameManager::DrawEntities(const std::vector<Entity*>& entities)
     {
         entity->Draw();
     }
+}
+
+void GameManager::MovePlayer(int dx, int dy)
+{
+    Vector2 coord = playerPtr->GetGridCoordinate();
+    gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
 }
