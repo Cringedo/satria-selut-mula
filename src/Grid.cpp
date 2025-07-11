@@ -20,7 +20,7 @@
 vector<Vector2> safeTiles;
 
 bool CheckForTile(Vector2 coord);
-void DisplayTileDetails(Tile tile);
+void DisplayTileDetails(const Tile& tile);
 std::stringstream tileDetails;
 
 Grid::Grid(int height, int width) : height(height), width(width)
@@ -184,6 +184,7 @@ vector<Vector2> GetTilesWithinRange()
 
 void Grid::Draw()
 {
+    bool tileDetailsDrawn = false;
     for (const Tile &tile : tiles)
     {
         // TraceLog(LOG_INFO, TextFormat("Tile %f, %f - %f", tile.GetRectangle().x, tile.GetRectangle().y, tile.GetNoiseValue()));
@@ -206,28 +207,27 @@ void Grid::Draw()
                 }
             }
 
-            if (CheckCollisionPointRec(GetMousePosition(), tile.GetRectangle()))
+            if (CheckCollisionPointRec(GetMousePosition(), tile.GetRectangle()) && !tileDetailsDrawn)
             {
                 DisplayTileDetails(tile);
+                tileDetailsDrawn = true; // Only show details for the first hovered tile
             }
         }
     }
 }
 
-void DisplayTileDetails(Tile tile)
+void DisplayTileDetails(const Tile& tile)
 {
-    // tileDetails << std::fixed << std::setprecision(2);
-    tileDetails << "Tile: [" << tile.GetGridCoordinate().x << ", " << tile.GetGridCoordinate().y << "]";
+    std::ostringstream details;
+    details << "Tile: [" << tile.GetGridCoordinate().x << ", " << tile.GetGridCoordinate().y << "]";
     float textSize = 32;
     float padding = 5;
 
-    float textWidth = MeasureText(tileDetails.str().c_str(), textSize);
+    float textWidth = MeasureText(details.str().c_str(), textSize);
 
     Rectangle debugPanelSize = {padding, 33, textWidth, textSize};
 
-    DrawText(tileDetails.str().c_str(), debugPanelSize.x + padding, debugPanelSize.y + padding, textSize, BLUE);
-    tileDetails.str("");
-    tileDetails.clear();
+    DrawText(details.str().c_str(), debugPanelSize.x + padding, debugPanelSize.y + padding, textSize, BLUE);
 }
 
 // ======================

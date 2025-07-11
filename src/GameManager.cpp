@@ -154,7 +154,6 @@ void GameManager::Draw()
     std::sort(drawableEntities.begin(), drawableEntities.end(),
               [](Entity *a, Entity *b)
               {
-                //   cout << "Sorting entities by grid coordinate: " << a->GetName() << " vs " << b->GetName() << endl;
                   return a->GetGridCoordinate().y < b->GetGridCoordinate().y;
               });
 
@@ -173,31 +172,14 @@ void GameManager::Draw()
     case GameState::PLAYING:
         gridPtr->Draw();
 
-        // TODO: Draw player and monsters based on their grid coordinates
-        // ---------- Draw Player and Monsters ----------
+        // Draw player and monsters based on their grid coordinates
+        DrawEntities(drawableEntities);
 
-        for (Entity *entity : drawableEntities)
-        {
-            // cout << "Drawing entity: " << drawableEntities[0]->GetName() << endl;
-            entity->Draw();
-        }
-
-        // for (unique_ptr<Monster> &monster : monstersPtr)
-        // {
-        //     // cout << "Drawing monster: " << monster->GetName() << endl;
-        //     monster->Draw();
-        // }
         break;
 
     case GameState::PAUSED:
         // Draw dimmed game state + pause overlay
-        // gridPtr->Draw();
-        // playerPtr->Draw();
-
-        // for (unique_ptr<Monster> &monster : monstersPtr)
-        // {
-        //     monster->Draw();
-        // }
+        DrawEntities(drawableEntities);
 
         // DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
         // DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
@@ -323,5 +305,13 @@ void GameManager::DrawEntityOrder(const std::vector<Entity *> &drawableEntities)
         const Entity *entity = drawableEntities[i];
         DrawText(TextFormat("%zu: %s", i, entity->GetName().c_str()),
                  10, 10 + static_cast<int>(i) * 20, 20, BLACK);
+    }
+}
+
+void GameManager::DrawEntities(const std::vector<Entity*>& entities)
+{
+    for (Entity* entity : entities)
+    {
+        entity->Draw();
     }
 }
