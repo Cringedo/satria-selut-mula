@@ -33,15 +33,13 @@ void GameManager::Init()
 {
     TraceLog(LOG_INFO, "GameManager: Initializing game systems...");
 
-    // TODO: Initialise the load for the monster.json
     LoadMonsterData("data/monster.json");
 
-    // Initialize your managed game objects/systems
+    // ----- Player and Grid Initialization -------
     playerPtr = std::make_unique<Player>(0, 0, "PlayerOne");
     gridPtr = std::make_unique<Grid>(GRID_HEIGHT, GRID_WIDTH);
     gridPtr->Generate();
 
-    // Place player at a random safe tile on the generated grid
     Vector2 playerSpawnCoordinate = gridPtr->GetRandomSafeTile();
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
     PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate();
@@ -51,6 +49,7 @@ void GameManager::Init()
     // ----- Mobs Spawn -------
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
+    // Temp: just spawn 2 monsters
     monstersPtr.emplace_back(move(monstersTemplate[0]));
     monstersPtr.emplace_back(move(monstersTemplate[1]));
     for (unique_ptr<Monster> &monster : monstersPtr)
@@ -103,7 +102,7 @@ void GameManager::Update(float dt)
 
         // Check for game over condition
         // if (playerPtr->IsDead()) ChangeState(GameState::GAMEOVER);
-        // if (IsKeyPressed(KEY_P)) ChangeState(GameState::PAUSED); // Example pause
+        if (IsKeyPressed(KEY_P)) ChangeState(GameState::PAUSED); // Example pause
         break;
     case GameState::PAUSED:
         // Update pause menu logic, check for resume or quit
@@ -157,18 +156,18 @@ void GameManager::Draw()
         break;
     case GameState::PLAYING:
         gridPtr->Draw();
-
+        
         // Draw player and monsters based on their grid coordinates
         DrawEntities(drawableEntities);
-
+        
         break;
-
-    case GameState::PAUSED:
-        // Draw dimmed game state + pause overlay
+        
+        case GameState::PAUSED:
+        gridPtr->Draw();
         DrawEntities(drawableEntities);
 
-        // DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
-        // DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
+        DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 60) / 2, GetScreenHeight() / 2 - 30, 60, WHITE);
         break;
     case GameState::GAMEOVER:
         DrawText("GAME OVER!", GetScreenWidth() / 2 - MeasureText("GAME OVER!", 60) / 2, GetScreenHeight() / 2 - 30, 60, RED);
