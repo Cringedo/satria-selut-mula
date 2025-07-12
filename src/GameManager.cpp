@@ -49,6 +49,7 @@ void GameManager::Init()
     // ----- Mobs Spawn -------
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
+
     // Temp: just spawn 2 monsters
     monstersPtr.emplace_back(move(monstersTemplate[0]));
     monstersPtr.emplace_back(move(monstersTemplate[1]));
@@ -307,6 +308,7 @@ void GameManager::DrawEntities(const std::vector<Entity*>& entities)
 
 void GameManager::MovePlayer(int dx, int dy)
 {
+    // TODO: check for collision with grid boundaries or obstacles
     Vector2 coord = playerPtr->GetGridCoordinate();
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
 }

@@ -68,7 +68,8 @@ void Grid::Generate()
             tile = Tile({temp.x, temp.y, SCALE, SCALE}, noiseValue);
             tile.SetGridCoordinate({(float)i, (float)j});
             tiles.push_back(tile);
-
+            
+            // TODO: perhaps instead of putting this into a vector, we can have it as map/dictionary
             if (tile.GetNoiseValue() < SAFE_TILE_NOISE)
             {
                 safeTiles.push_back(tile.GetGridCoordinate());
@@ -82,8 +83,6 @@ void Grid::Generate()
     }
 }
 
-// TODO: since it is entity -> monster class doesn't really cook
-// Cast as Monster instead?
 void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
 {
     Tile *tile = GetTileByGridCoordinate(i, j);
@@ -197,7 +196,6 @@ void Grid::Draw()
         else
         {
             DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, WHITE);
-            // TODO: HERE
             for (Vector2 range : GetTilesWithinRange())
             {
                 if (tile.GetGridCoordinate().x == range.x && tile.GetGridCoordinate().y == range.y)
