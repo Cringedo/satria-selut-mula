@@ -62,7 +62,7 @@ Vector2 Player::GetPosition()
 
 Vector2 Player::GetGridCoordinate() const
 {
-    cout << "Player GetGridCoordinate: " << gridCoordinate.x << ", " << gridCoordinate.y << endl;
+    // cout << "Player GetGridCoordinate: " << gridCoordinate.x << ", " << gridCoordinate.y << endl;
     return gridCoordinate;
 }
 

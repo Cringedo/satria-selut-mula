@@ -81,6 +81,7 @@ void GameManager::Update(float dt)
         }
         break;
     case GameState::PLAYING:
+        // TODO: we can have this to be based on the player movement speed
         if (IsKeyPressed(KEY_RIGHT)) MovePlayer(1, 0);
         if (IsKeyPressed(KEY_LEFT))  MovePlayer(-1, 0);
         if (IsKeyPressed(KEY_UP))    MovePlayer(0, 1);
@@ -310,5 +311,10 @@ void GameManager::MovePlayer(int dx, int dy)
 {
     // TODO: check for collision with grid boundaries or obstacles
     Vector2 coord = playerPtr->GetGridCoordinate();
+    if (coord.x + dx < 0 || coord.x + dx >= gridPtr->GetSize().first ||
+        coord.y + dy < 0 || coord.y + dy >= gridPtr->GetSize().second)
+    {
+        return; 
+    }
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
-}
+} 
