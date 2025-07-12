@@ -49,7 +49,7 @@ void GameManager::Init()
     // ----- Mobs Spawn -------
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
-
+    
     // Temp: just spawn 2 monsters
     monstersPtr.emplace_back(move(monstersTemplate[0]));
     monstersPtr.emplace_back(move(monstersTemplate[1]));
@@ -316,5 +316,8 @@ void GameManager::MovePlayer(int dx, int dy)
     {
         return; 
     }
+
+    
+
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
 } 

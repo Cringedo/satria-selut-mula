@@ -54,7 +54,7 @@ void Grid::Generate()
 
     // This is assign the tile based on the coordinate
     Vector3 temp;
-    Tile tile = Tile({}, {});
+    Tile tile = Tile({}, {}, TileType::EMPTY_TILE);
 
     vector<Tile> tempTiles;
     for (int i = 0; i < height; i++)
@@ -65,15 +65,18 @@ void Grid::Generate()
             temp = Vector3Transform({(float)i * SCALE, (float)j * SCALE, 1}, toIso);
             float noiseValue = noise.GetNoise((float)i, (float)j) * 10;
 
-            tile = Tile({temp.x, temp.y, SCALE, SCALE}, noiseValue);
+            tile = Tile({temp.x, temp.y, SCALE, SCALE}, noiseValue, TileType::EMPTY_TILE);
+            
+            // Check if the tile is walkable
+            if (tile.GetNoiseValue() < SAFE_TILE_NOISE)
+            {
+                tile.SetTileType(TileType::SAFE_TILE);
+            }
+
             tile.SetGridCoordinate({(float)i, (float)j});
             tempTiles.push_back(tile);
+            
 
-            // TODO: perhaps instead of putting this into a vector, we can use 2d vector
-            // if (tile.GetNoiseValue() < SAFE_TILE_NOISE)
-            // {
-            //     tempSafeTiles.push_back(tile.GetGridCoordinate());
-            // }
         }
         TraceLog(LOG_INFO, "Finished processing row: %d", i);
         TraceLog(LOG_INFO, "Tile Count: %zu", tempTiles.size());
@@ -108,39 +111,49 @@ void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
 
 void Grid::PlaceMonsterByGridCoordinate(Monster &monster, int i, int j)
 {
-    // Tile *tile = GetTileByGridCoordinate(i, j);
+    // cout << monster.GetName() << endl;
+    TraceLog(LOG_INFO, "Monster %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", monster.GetName(), i, j, monster.GetGridCoordinate().x, monster.GetGridCoordinate().y);
+    
     Tile *tile = &tiles[i][j];
-    cout << monster.GetName() << endl;
-    TraceLog(LOG_INFO, "Monster %s  is spawning at [%d, %d]", monster.GetName(), i, j);
-    if (tile)
+    if (tile->GetTileType() != TileType::EMPTY_TILE)
     {
+        if (monster.GetGridCoordinate().x <= GRID_WIDTH && monster.GetGridCoordinate().y <= GRID_HEIGHT)
+        {
+            tiles[static_cast<int>(monster.GetGridCoordinate().x)][static_cast<int>(monster.GetGridCoordinate().y)].SetTileType(TileType::SAFE_TILE);
+        }
+
         Rectangle rect = tile->GetRectangle();
         monster.SetPosition(rect.x, rect.y - rect.height / 2.0f);
         monster.SetGridPosition(i, j);
+        tile->SetTileType(TileType::MONSTER_TILE);
     }
 }
 
 void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 {
-    // Tile *tile = GetTileByGridCoordinate(i, j);
+    // TraceLog(LOG_INFO, "Player %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", player.GetName(), i, j, player.GetGridCoordinate().x, player.GetGridCoordinate().y);
+    // cout << tile->GetGridCoordinate().x << ", " << tile->GetGridCoordinate().y << endl;
+    
     Tile *tile = &tiles[i][j];
 
-    cout << tile->GetGridCoordinate().x << ", " << tile->GetGridCoordinate().y << endl;
-
-    if (tile)
+    TraceLog(LOG_INFO, "tile type: %zu", tile->GetTileType());
+    if (tile->GetTileType() != TileType::EMPTY_TILE)
     {
+        if (player.GetGridCoordinate().x <= GRID_WIDTH && player.GetGridCoordinate().y <= GRID_HEIGHT)
+        {
+            tiles[static_cast<int>(player.GetGridCoordinate().x)][static_cast<int>(player.GetGridCoordinate().y)].SetTileType(TileType::SAFE_TILE);
+        }
         Rectangle rect = tile->GetRectangle();
         player.SetPosition(rect.x, rect.y - rect.height / 2.0f);
         player.SetGridPosition(i, j);
+        tile->SetTileType(TileType::PLAYER_TILE);
     }
 }
 
-// TODO: probably can use std::map to make this faster
 bool Grid::CheckForTile(Vector2 coord)
 {
-    if (tiles[coord.x][coord.y].GetNoiseValue() < SAFE_TILE_NOISE)
+    if (tiles[static_cast<int>(coord.x)][static_cast<int>(coord.y)].GetTileType() == TileType::SAFE_TILE)
     {
-        TraceLog(LOG_INFO, "Tile at [%0.0f, %0.0f] is safe", coord.x, coord.y);
         return true;
     }
 
@@ -160,7 +173,6 @@ Vector2 Grid::GetRandomSafeTile()
         safeSpawn = CheckForTile({(float)randomX, (float)randomY});
     }
 
-    // TraceLog(LOG_INFO, "!!!Spawning at [%d, %d]", randomX, randomY);
     return {(float)randomX, (float)randomY};
 }
 
@@ -183,6 +195,7 @@ Tile *Grid::GetTileByGridCoordinate(int i, int j)
     return nullptr;
 }
 
+// Moveable Tiles: Helper function to get tiles within range of the player
 vector<Vector2> GetTilesWithinRange()
 {
     vector<Vector2> rangeTiles;
@@ -247,7 +260,7 @@ void DisplayTileDetails(const Tile &tile)
 // ======================
 // TILE Section
 
-Tile::Tile(Rectangle rectangle, float noiseValue) : rectangle(rectangle), noiseValue(noiseValue), GameObject({})
+Tile::Tile(Rectangle rectangle, float noiseValue, TileType type) : rectangle(rectangle), noiseValue(noiseValue), type(type), GameObject({})
 {
     SetIsoCoordinate(rectangle);
     SetGridCoordinate(gridCoordinate);
