@@ -17,10 +17,8 @@
 // ======================
 // GRID
 
-vector<Vector2> safeTiles;
-
 bool CheckForTile(Vector2 coord);
-void DisplayTileDetails(const Tile& tile);
+void DisplayTileDetails(const Tile &tile);
 std::stringstream tileDetails;
 
 Grid::Grid(int height, int width) : height(height), width(width)
@@ -46,7 +44,6 @@ std::pair<int, int> Grid::GetSize()
 void Grid::Generate()
 {
     tiles.clear();
-    safeTiles.clear();
 
     TraceLog(LOG_INFO, "Starting: Generate the grids");
 
@@ -58,7 +55,7 @@ void Grid::Generate()
     // This is assign the tile based on the coordinate
     Vector3 temp;
     Tile tile = Tile({}, {});
-    
+
     vector<Tile> tempTiles;
     for (int i = 0; i < height; i++)
     {
@@ -73,10 +70,10 @@ void Grid::Generate()
             tempTiles.push_back(tile);
 
             // TODO: perhaps instead of putting this into a vector, we can use 2d vector
-            if (tile.GetNoiseValue() < SAFE_TILE_NOISE)
-            {
-                safeTiles.push_back(tile.GetGridCoordinate());
-            }
+            // if (tile.GetNoiseValue() < SAFE_TILE_NOISE)
+            // {
+            //     tempSafeTiles.push_back(tile.GetGridCoordinate());
+            // }
         }
         TraceLog(LOG_INFO, "Finished processing row: %d", i);
         TraceLog(LOG_INFO, "Tile Count: %zu", tempTiles.size());
@@ -93,10 +90,6 @@ void Grid::Generate()
     //     }
     //     TraceLog(LOG_INFO, "Finished processing row: %zu", rowIdx);
     // }
-    // Handling object spawn
-    for (Vector2 &v : safeTiles){
-
-    }
 }
 
 void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
@@ -131,7 +124,7 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 {
     // Tile *tile = GetTileByGridCoordinate(i, j);
     Tile *tile = &tiles[i][j];
-    
+
     cout << tile->GetGridCoordinate().x << ", " << tile->GetGridCoordinate().y << endl;
 
     if (tile)
@@ -143,15 +136,12 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 }
 
 // TODO: probably can use std::map to make this faster
-bool CheckForTile(Vector2 coord)
+bool Grid::CheckForTile(Vector2 coord)
 {
-    for (Vector2 &c : safeTiles)
+    if (tiles[coord.x][coord.y].GetNoiseValue() < SAFE_TILE_NOISE)
     {
-        // TraceLog(LOG_INFO, "Checking for [%f, %f] - [%f, %f]", coord.x, coord.y, c.x, c.y);
-        if (c.x == coord.x && c.y == coord.y)
-        {
-            return true;
-        }
+        TraceLog(LOG_INFO, "Tile at [%0.0f, %0.0f] is safe", coord.x, coord.y);
+        return true;
     }
 
     return false;
@@ -160,16 +150,14 @@ bool CheckForTile(Vector2 coord)
 Vector2 Grid::GetRandomSafeTile()
 {
     bool safeSpawn = false;
-    int randomX = std::rand() % GRID_WIDTH;
-    int randomY = std::rand() % GRID_HEIGHT;
-
+    int randomX;
+    int randomY;
+    
     while (!safeSpawn)
     {
-        // FIXME: This doesn't really check for a safe tile
-        safeSpawn = CheckForTile({(float)randomX, (float)randomY});
-
         randomX = std::rand() % GRID_WIDTH;
         randomY = std::rand() % GRID_HEIGHT;
+        safeSpawn = CheckForTile({(float)randomX, (float)randomY});
     }
 
     // TraceLog(LOG_INFO, "!!!Spawning at [%d, %d]", randomX, randomY);
@@ -179,7 +167,7 @@ Vector2 Grid::GetRandomSafeTile()
 Tile *Grid::GetTileByGridCoordinate(int i, int j)
 {
     TraceLog(LOG_INFO, "Coordinate an Entity Position[%0.0f,%0.0f]", (float)i, (float)j);
-    for (auto& row : tiles)
+    for (auto &row : tiles)
     {
         for (Tile &tile : row)
         {
@@ -210,15 +198,14 @@ vector<Vector2> GetTilesWithinRange()
 void Grid::Draw()
 {
     bool tileDetailsDrawn = false;
-    for (const auto& row : tiles)
+    for (const auto &row : tiles)
     {
-        for (const Tile& tile : row)
+        for (const Tile &tile : row)
         {
             // TraceLog(LOG_INFO, TextFormat("Tile %f, %f - %f", tile.GetRectangle().x, tile.GetRectangle().y, tile.GetNoiseValue()));
             if (tile.GetNoiseValue() > SAFE_TILE_NOISE)
             {
                 // DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, RED);
-                safeTiles.push_back({tile.GetRectangle().x, tile.GetRectangle().y});
                 continue;
             }
             else
@@ -243,7 +230,7 @@ void Grid::Draw()
     }
 }
 
-void DisplayTileDetails(const Tile& tile)
+void DisplayTileDetails(const Tile &tile)
 {
     std::ostringstream details;
     details << "Tile: [" << tile.GetGridCoordinate().x << ", " << tile.GetGridCoordinate().y << "]";
