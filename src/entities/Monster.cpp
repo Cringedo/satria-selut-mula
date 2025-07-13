@@ -36,7 +36,7 @@ Monster::Monster(
 }
 
 Monster::Monster(const Monster &other)
-    : Entity(other),
+    : Entity(other.name),
       levelMin(other.levelMin), levelMax(other.levelMax),
       baseHealth(other.baseHealth), baseDamage(other.baseDamage),
       goldDrop(other.goldDrop), spawnWeight(other.spawnWeight)
@@ -45,6 +45,8 @@ Monster::Monster(const Monster &other)
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 }
+
+// ---- [Properties] ----
 
 int Monster::getLevelMin() const
 {
@@ -76,7 +78,7 @@ float Monster::getSpawnWeight() const
     return spawnWeight;
 }
 
-// TODO: Monster Health Calculation
+// TODO: implement properly the monster scaling
 float Monster::calculateHealthAtLevel(int level) const
 {
     // Ensure the level is within the defined min and max levels for the monster
@@ -86,6 +88,8 @@ float Monster::calculateHealthAtLevel(int level) const
     // You can adjust this formula based on your game's balancing
     return baseHealth + (clampedLevel - levelMin) * 10.0f;
 }
+
+// ---- [Position and Grid Coordinate] ----
 
 Vector2 Monster::GetPosition() const
 {
@@ -128,7 +132,10 @@ void Monster::Draw()
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
 
-// -----[Green Slime] -------
+
+// ======== [Monster Subclass ] ========
+
+// -----[Green Slime]-------
 GreenSlime::GreenSlime(
     const std::string &idVal,
     const std::string &nameVal,
@@ -155,5 +162,10 @@ GreenSlime::GreenSlime(
 
 void GreenSlime::Draw()
 {
-    DrawTexturePro(texture, source, dest, {}, 0.0f, GREEN);
+    DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
 }
+
+// TODO: Implement other monster subclasses
+
+// ---- [Dark Green Slime] ----
+// ---- [White Slime] ----
