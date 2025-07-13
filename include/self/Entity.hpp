@@ -1,15 +1,12 @@
 #pragma once
 
 #include <self/GameObject.hpp>
-#include <self/AttackStrategy.hpp>
 
 #include <raylib.h>
 #include <string>
 #include <memory>
 
 using namespace std;
-
-class IAttackStrategy;
 
 class Entity : public GameObject
 {
@@ -40,7 +37,6 @@ public:
 
     // ---- [Interface] ----
 
-    virtual void SetAttackStrategy(IAttackStrategy *strategy) { attackStrategy = unique_ptr<IAttackStrategy>(strategy); }
 
     // ---- [Drawing] ----
 
@@ -60,7 +56,6 @@ protected:
     Texture2D texture;
     Rectangle source;
 
-    unique_ptr<IAttackStrategy> attackStrategy = nullptr;
 };
 
 class Player : public Entity
