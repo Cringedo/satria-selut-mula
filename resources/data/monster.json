@@ -28,5 +28,15 @@
     "baseDamage": 30,
     "goldDrop": 50,
     "spawnWeight": 0.05
+  },
+  {
+    "id": "green_slime",
+    "name": "Green Slime",
+    "levelMin": 1,
+    "levelMax": 5,
+    "baseHealth": 10,
+    "baseDamage": 2,
+    "goldDrop": 5,
+    "spawnWeight": 1.0
   }
 ]

@@ -87,6 +87,11 @@ float Monster::calculateHealthAtLevel(int level) const
     return baseHealth + (clampedLevel - levelMin) * 10.0f;
 }
 
+Vector2 Monster::GetPosition() const
+{
+    return position; // Return the 'position' member variable
+}
+
 Vector2 Monster::GetGridCoordinate() const
 {
     return gridCoordinate;
@@ -121,4 +126,34 @@ void Monster::Draw()
     // cout << "--------- Monster: " << dest.x << "," << dest.y << endl;
     // cout << Entity::GetName() << " is at " << source.x << ", " << source.y << endl;
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
+}
+
+// -----[Green Slime] -------
+GreenSlime::GreenSlime(
+    const std::string &idVal,
+    const std::string &nameVal,
+    int levelMinVal,
+    int levelMaxVal,
+    float baseHealthVal,
+    float baseDamageVal,
+    int goldDropVal,
+    float spawnWeightVal)
+    : Monster(idVal, nameVal, levelMinVal, levelMaxVal, baseHealthVal, baseDamageVal, goldDropVal, spawnWeightVal)
+{
+    Image image = LoadImage("resources/sprites/green_slime.png");
+    texture = LoadTextureFromImage(image);
+    UnloadImage(image);
+
+    source.x = 0;
+    source.y = 0;
+    source.width = (float)texture.width;
+    source.height = (float)texture.height;
+
+    std::cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << std::endl;
+    std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
+}
+
+void GreenSlime::Draw()
+{
+    DrawTexturePro(texture, source, dest, {}, 0.0f, GREEN);
 }

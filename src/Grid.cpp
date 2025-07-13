@@ -45,7 +45,7 @@ void Grid::Generate()
 {
     tiles.clear();
 
-    TraceLog(LOG_INFO, "Starting: Generate the grids");
+    TraceLog(LOG_INFO, "Starting: Generate the grids..");
 
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_Value);
@@ -78,8 +78,8 @@ void Grid::Generate()
             
 
         }
-        TraceLog(LOG_INFO, "Finished processing row: %d", i);
-        TraceLog(LOG_INFO, "Tile Count: %zu", tempTiles.size());
+        // TraceLog(LOG_INFO, "Finished processing row: %d", i);
+        // TraceLog(LOG_INFO, "Tile Count: %zu", tempTiles.size());
         tiles.push_back(tempTiles);
     }
 
@@ -113,7 +113,7 @@ void Grid::PlaceMonsterByGridCoordinate(Monster &monster, int i, int j)
 {
     // cout << monster.GetName() << endl;
     TraceLog(LOG_INFO, "Monster %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", monster.GetName(), i, j, monster.GetGridCoordinate().x, monster.GetGridCoordinate().y);
-    
+
     Tile *tile = &tiles[i][j];
     if (tile->GetTileType() != TileType::EMPTY_TILE)
     {
@@ -162,6 +162,7 @@ bool Grid::CheckForTile(Vector2 coord)
 
 Vector2 Grid::GetRandomSafeTile()
 {
+    cout << "Spawning a random safe tile..." << endl;
     bool safeSpawn = false;
     int randomX;
     int randomY;

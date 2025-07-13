@@ -118,7 +118,7 @@ package: release
 	$(MKDIR) $(call platformpth, $(buildDir)/resources)
 
 	# Copy resources from the 'resources' directory to the build directory NEED MANUALLY TO DO
-	-robocopy "$(subst /,\,$(CURDIR)/resources)" "$(subst /,\,$(CURDIR)/$(buildDir)/resources)" *.* /E
+	-robocopy "$(call platformpth,resources)" "$(call platformpth,$(buildDir)/resources)" *.*
 	@echo robocopy $(subst /,\,$(CURDIR)/resources) $(subst /,\,$(CURDIR)/$(buildDir)/resources) /E
 
 ifeq ($(OS), Windows_NT)

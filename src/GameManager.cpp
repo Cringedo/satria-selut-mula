@@ -51,10 +51,11 @@ void GameManager::Init()
     Vector2 monsterSpawnCoordinate;
 
     // Temp: just spawn 2 monsters
-    monstersPtr.emplace_back(move(monstersTemplate[0]));
+    monstersPtr.emplace_back(move(monsterTemplateMap["green_slime"]));
     monstersPtr.emplace_back(move(monstersTemplate[1]));
     for (unique_ptr<Monster> &monster : monstersPtr)
     {
+        TraceLog(LOG_INFO, "[GameManager]: Spawning monster %s", monster->GetName().c_str());
         monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
         gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
     }
@@ -82,10 +83,14 @@ void GameManager::Update(float dt)
         break;
     case GameState::PLAYING:
         // TODO: we can have this to be based on the player movement speed
-        if (IsKeyPressed(KEY_RIGHT)) MovePlayer(1, 0);
-        if (IsKeyPressed(KEY_LEFT))  MovePlayer(-1, 0);
-        if (IsKeyPressed(KEY_UP))    MovePlayer(0, 1);
-        if (IsKeyPressed(KEY_DOWN))  MovePlayer(0, -1);
+        if (IsKeyPressed(KEY_RIGHT))
+            MovePlayer(1, 0);
+        if (IsKeyPressed(KEY_LEFT))
+            MovePlayer(-1, 0);
+        if (IsKeyPressed(KEY_UP))
+            MovePlayer(0, 1);
+        if (IsKeyPressed(KEY_DOWN))
+            MovePlayer(0, -1);
 
         if (IsKeyPressed(KEY_Z))
         {
@@ -101,10 +106,12 @@ void GameManager::Update(float dt)
             }
         }
         PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); // Keep global in sync
-
+        cout << "Slime Grid Coordinate: " << monstersPtr[0]->GetGridCoordinate().x << ", " << monstersPtr[0]->GetGridCoordinate().y << endl;
+        cout << "Slime Destination Coordinate: " << monstersPtr[0]->GetPosition().x << ", " << monstersPtr[0]->GetPosition().y << endl;
         // Check for game over condition
         // if (playerPtr->IsDead()) ChangeState(GameState::GAMEOVER);
-        if (IsKeyPressed(KEY_P)) ChangeState(GameState::PAUSED); // Example pause
+        if (IsKeyPressed(KEY_P))
+            ChangeState(GameState::PAUSED); // Example pause
         break;
     case GameState::PAUSED:
         // Update pause menu logic, check for resume or quit
@@ -158,13 +165,13 @@ void GameManager::Draw()
         break;
     case GameState::PLAYING:
         gridPtr->Draw();
-        
+
         // Draw player and monsters based on their grid coordinates
         DrawEntities(drawableEntities);
-        
+
         break;
-        
-        case GameState::PAUSED:
+
+    case GameState::PAUSED:
         gridPtr->Draw();
         DrawEntities(drawableEntities);
 
@@ -239,7 +246,18 @@ bool GameManager::LoadMonsterData(const string &filePath)
             // );
 
             // Store a pointer to the newly added template monster
-            monsterTemplateMap[id] = &monstersTemplate.back();
+            if (id == "green_slime")
+            {
+                TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+                monsterTemplateMap[id] = make_unique<GreenSlime>(
+                id, name, levelMin, levelMax,
+                baseHealth, baseDamage, goldDrop, spawnWeight);
+            }
+            else
+            {
+                TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+            }
+            
         }
         std::cout << "Successfully loaded " << monstersTemplate.size() << " monster templates from " << filePath << std::endl;
         return true;
@@ -286,7 +304,7 @@ void GameManager::ExitState(GameState state)
 
 void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEntities)
 {
-    int yOffset = 200; 
+    int yOffset = 200;
     int gap = 20;
 
     DrawText("Entity Draw Order:", 10, yOffset - 30, 20, BLACK);
@@ -299,9 +317,9 @@ void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEn
     }
 }
 
-void GameManager::DrawEntities(const std::vector<Entity*>& entities)
+void GameManager::DrawEntities(const std::vector<Entity *> &entities)
 {
-    for (Entity* entity : entities)
+    for (Entity *entity : entities)
     {
         entity->Draw();
     }
@@ -314,10 +332,8 @@ void GameManager::MovePlayer(int dx, int dy)
     if (coord.x + dx < 0 || coord.x + dx >= gridPtr->GetSize().first ||
         coord.y + dy < 0 || coord.y + dy >= gridPtr->GetSize().second)
     {
-        return; 
+        return;
     }
 
-    
-
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
-} 
+}
