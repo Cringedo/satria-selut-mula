@@ -22,7 +22,7 @@ Monster::Monster(
       goldDrop(goldDropVal),
       spawnWeight(spawnWeightVal)
 {
-    Image image = LoadImage("sprites/player_template.png");
+    Image image = LoadImage("resources/sprites/player_template.png");
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 
@@ -41,7 +41,7 @@ Monster::Monster(const Monster &other)
       baseHealth(other.baseHealth), baseDamage(other.baseDamage),
       goldDrop(other.goldDrop), spawnWeight(other.spawnWeight)
 {
-    Image image = LoadImage("sprites/player_template.png"); // Temporary picture
+    Image image = LoadImage("resources/sprites/player_template.png"); // Temporary picture
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 }

@@ -13,7 +13,7 @@ using namespace std;
 Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity(n) 
 {
     TraceLog(LOG_INFO, "Player (%s) has been created at [%0.0f, %0.0f]", n, position.x, position.y);
-    Image image = LoadImage("sprites/player_template.png");
+    Image image = LoadImage("resources/sprites/player_template.png");
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 

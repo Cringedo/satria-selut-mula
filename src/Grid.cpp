@@ -23,7 +23,7 @@ std::stringstream tileDetails;
 
 Grid::Grid(int height, int width) : height(height), width(width)
 {
-    Image image = LoadImage("sprites/tile.png");
+    Image image = LoadImage("resources/sprites/tile.png");
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 

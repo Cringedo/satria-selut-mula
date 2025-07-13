@@ -33,7 +33,7 @@ void GameManager::Init()
 {
     TraceLog(LOG_INFO, "GameManager: Initializing game systems...");
 
-    LoadMonsterData("data/monster.json");
+    LoadMonsterData("resources/data/monster.json");
 
     // ----- Player and Grid Initialization -------
     playerPtr = std::make_unique<Player>(0, 0, "PlayerOne");
@@ -49,7 +49,7 @@ void GameManager::Init()
     // ----- Mobs Spawn -------
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
-    
+
     // Temp: just spawn 2 monsters
     monstersPtr.emplace_back(move(monstersTemplate[0]));
     monstersPtr.emplace_back(move(monstersTemplate[1]));

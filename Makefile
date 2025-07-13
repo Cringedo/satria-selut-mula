@@ -99,3 +99,36 @@ execute:
 # Clean up all relevant files
 clean:
 	$(RM) $(call platformpth, $(buildDir)/*)
+
+# The 'release' target builds an optimized, stripped executable for distribution.
+# It overrides the default compileFlags and linkFlags for this specific build.
+release: CXXFLAGS := $(compileFlags) -O2 -s -fPIC # Add release flags
+release: LDFLAGS := $(linkFlags) # Use existing linkFlags (which might include -static)
+release: $(target)
+	@echo "--- Release build complete: $(target) ---"
+
+# The 'package' target builds the release version and creates a distributable archive.
+package: release
+	@echo "--- Creating distribution package ---"
+	# Ensure the executable directory exists (might have been created by 'release')
+	$(MKDIR) $(call platformpth, $(buildDir)) # Renamed from 'bin' in your current Makefile to 'build'
+
+	# IMPORTANT: Create a 'resources' subdirectory next to your executable for assets.
+	# You MUST ensure your game loads assets from this 'resources/' path relative to the executable.
+	$(MKDIR) $(call platformpth, $(buildDir)/resources)
+
+	# Copy resources from the 'resources' directory to the build directory NEED MANUALLY TO DO
+	-robocopy "$(subst /,\,$(CURDIR)/resources)" "$(subst /,\,$(CURDIR)/$(buildDir)/resources)" *.* /E
+	@echo robocopy $(subst /,\,$(CURDIR)/resources) $(subst /,\,$(CURDIR)/$(buildDir)/resources) /E
+
+ifeq ($(OS), Windows_NT)
+	# Windows packaging using PowerShell Compress-Archive
+	powershell Compress-Archive -Path "$(call platformpth,$(buildDir))\*" -DestinationPath "$(call platformpth,$(buildDir))/../$(executable)-windows.zip" -Force
+else ifeq ($(shell uname),Darwin)
+	# macOS packaging using tar (creates a .tar.gz from contents of the 'bin' folder)
+	tar -czvf $(buildDir)/../$(executable)-macos.tar.gz -C $(buildDir) .
+else
+	# Linux packaging using tar (creates a .tar.gz from contents of the 'bin' folder)
+	tar -czvf $(buildDir)/../$(executable)-linux.tar.gz -C $(buildDir) .
+endif
+	@echo "--- Package created at $(buildDir)/../$(executable)-$(platform).zip/.tar.gz ---"
