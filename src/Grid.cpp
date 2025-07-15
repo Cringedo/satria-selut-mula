@@ -54,9 +54,9 @@ void Grid::Generate()
 
     // This is assign the tile based on the coordinate
     Vector3 temp;
-    Tile tile = Tile({}, {}, TileType::EMPTY_TILE);
+    // unique_ptr<Tile> tile = make_unique<Tile>(Rectangle{}, 0.0f, TileType::EMPTY_TILE);
 
-    vector<Tile> tempTiles;
+    vector<unique_ptr<Tile>> tempTiles;
     for (int i = 0; i < height; i++)
     {
         tempTiles.clear();
@@ -65,22 +65,21 @@ void Grid::Generate()
             temp = Vector3Transform({(float)i * SCALE, (float)j * SCALE, 1}, toIso);
             float noiseValue = noise.GetNoise((float)i, (float)j) * 10;
 
-            tile = Tile({temp.x, temp.y, SCALE, SCALE}, noiseValue, TileType::EMPTY_TILE);
-            
+            unique_ptr<Tile> tile = make_unique<Tile>(Rectangle{temp.x, temp.y, SCALE, SCALE}, noiseValue, TileType::EMPTY_TILE);
+
             // Check if the tile is walkable
-            if (tile.GetNoiseValue() < SAFE_TILE_NOISE)
+            if (tile->GetNoiseValue() < SAFE_TILE_NOISE)
             {
-                tile.SetTileType(TileType::SAFE_TILE);
+                tile->SetTileType(TileType::SAFE_TILE);
             }
 
-            tile.SetGridCoordinate({(float)i, (float)j});
-            tempTiles.push_back(tile);
-            
+            tile->SetGridCoordinate({(float)i, (float)j});
+            tempTiles.push_back(move(tile));
 
         }
         // TraceLog(LOG_INFO, "Finished processing row: %d", i);
         // TraceLog(LOG_INFO, "Tile Count: %zu", tempTiles.size());
-        tiles.push_back(tempTiles);
+        tiles.push_back(move(tempTiles));
     }
 
     // for (size_t rowIdx = 0; rowIdx < tiles.size(); ++rowIdx)
@@ -98,7 +97,7 @@ void Grid::Generate()
 void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
 {
     // Tile *tile = GetTileByGridCoordinate(i, j);
-    Tile *tile = &tiles[i][j];
+    Tile* tile = tiles[i][j].get();
     cout << entity.GetName() << endl;
     TraceLog(LOG_INFO, "Monster %s  is spawning at [%d, %d]", entity.GetName(), i, j);
     if (tile)
@@ -114,18 +113,20 @@ void Grid::PlaceMonsterByGridCoordinate(Monster &monster, int i, int j)
     // cout << monster.GetName() << endl;
     TraceLog(LOG_INFO, "Monster %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", monster.GetName(), i, j, monster.GetGridCoordinate().x, monster.GetGridCoordinate().y);
 
-    Tile *tile = &tiles[i][j];
+    Tile* tile = tiles[i][j].get();
     if (tile->GetTileType() != TileType::EMPTY_TILE)
     {
         if (monster.GetGridCoordinate().x <= GRID_WIDTH && monster.GetGridCoordinate().y <= GRID_HEIGHT)
         {
-            tiles[static_cast<int>(monster.GetGridCoordinate().x)][static_cast<int>(monster.GetGridCoordinate().y)].SetTileType(TileType::SAFE_TILE);
+            tiles[static_cast<int>(monster.GetGridCoordinate().x)][static_cast<int>(monster.GetGridCoordinate().y)]->SetTileType(TileType::SAFE_TILE);
+            tiles[static_cast<int>(monster.GetGridCoordinate().x)][static_cast<int>(monster.GetGridCoordinate().y)]->ClearEntity();
         }
 
         Rectangle rect = tile->GetRectangle();
         monster.SetPosition(rect.x, rect.y - rect.height / 2.0f);
         monster.SetGridPosition(i, j);
         tile->SetTileType(TileType::MONSTER_TILE);
+        tile->SetEntity(std::make_unique<Monster>(monster));
     }
 }
 
@@ -134,14 +135,26 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
     // TraceLog(LOG_INFO, "Player %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", player.GetName(), i, j, player.GetGridCoordinate().x, player.GetGridCoordinate().y);
     // cout << tile->GetGridCoordinate().x << ", " << tile->GetGridCoordinate().y << endl;
     
-    Tile *tile = &tiles[i][j];
+    Tile* tile = tiles[i][j].get();
 
-    TraceLog(LOG_INFO, "tile type: %zu", tile->GetTileType());
+    // TraceLog(LOG_INFO, "tile type: %zu", tile->GetTileType());
+    if(tile->GetTileType() == TileType::MONSTER_TILE)
+    {
+        TraceLog(LOG_INFO, "Player %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", player.GetName(), i, j, player.GetGridCoordinate().x, player.GetGridCoordinate().y);
+
+        Monster* monster = dynamic_cast<Monster*>(tile->GetEntity().get());
+        TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
+        monster->SetHealth(monster->GetHealth() - player.GetDamage());
+        TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
+
+        return;
+    }
+
     if (tile->GetTileType() != TileType::EMPTY_TILE)
     {
         if (player.GetGridCoordinate().x <= GRID_WIDTH && player.GetGridCoordinate().y <= GRID_HEIGHT)
         {
-            tiles[static_cast<int>(player.GetGridCoordinate().x)][static_cast<int>(player.GetGridCoordinate().y)].SetTileType(TileType::SAFE_TILE);
+            tiles[static_cast<int>(player.GetGridCoordinate().x)][static_cast<int>(player.GetGridCoordinate().y)]->SetTileType(TileType::SAFE_TILE);
         }
         Rectangle rect = tile->GetRectangle();
         player.SetPosition(rect.x, rect.y - rect.height / 2.0f);
@@ -152,7 +165,7 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
 
 bool Grid::CheckForTile(Vector2 coord)
 {
-    if (tiles[static_cast<int>(coord.x)][static_cast<int>(coord.y)].GetTileType() == TileType::SAFE_TILE)
+    if (tiles[static_cast<int>(coord.x)][static_cast<int>(coord.y)]->GetTileType() == TileType::SAFE_TILE)
     {
         return true;
     }
@@ -177,18 +190,18 @@ Vector2 Grid::GetRandomSafeTile()
     return {(float)randomX, (float)randomY};
 }
 
-Tile *Grid::GetTileByGridCoordinate(int i, int j)
+Tile* Grid::GetTileByGridCoordinate(int i, int j)
 {
     TraceLog(LOG_INFO, "Coordinate an Entity Position[%0.0f,%0.0f]", (float)i, (float)j);
-    for (auto &row : tiles)
+    for (const auto &row : tiles)
     {
-        for (Tile &tile : row)
+        for (const auto &tile : row)
         {
             // TraceLog(LOG_INFO, "Coordinate [%0.0f,%0.0f]", tile.GetGridCoordinate().x, tile.GetGridCoordinate().y);
-            if (tile.GetGridCoordinate().x == float(i) && tile.GetGridCoordinate().y == float(j))
+            if (tile->GetGridCoordinate().x == float(i) && tile->GetGridCoordinate().y == float(j))
             {
                 // TraceLog(LOG_INFO, "Found the exact coordinate at Tile[%0.0f,%0.0f]-[%0.0f,%0.0f]", tile.GetGridCoordinate().x, tile.GetGridCoordinate().y, float(i), float(j));
-                return &tile;
+                return tile.get();
             }
         }
     }
@@ -214,29 +227,29 @@ void Grid::Draw()
     bool tileDetailsDrawn = false;
     for (const auto &row : tiles)
     {
-        for (const Tile &tile : row)
+        for (const auto &tile : row)
         {
             // TraceLog(LOG_INFO, TextFormat("Tile %f, %f - %f", tile.GetRectangle().x, tile.GetRectangle().y, tile.GetNoiseValue()));
-            if (tile.GetNoiseValue() > SAFE_TILE_NOISE)
+            if (tile->GetNoiseValue() > SAFE_TILE_NOISE)
             {
                 // DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, RED);
                 continue;
             }
             else
             {
-                DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, WHITE);
+                DrawTexturePro(texture, source, tile->GetRectangle(), {}, 0.0f, WHITE);
                 for (Vector2 range : GetTilesWithinRange())
                 {
-                    if (tile.GetGridCoordinate().x == range.x && tile.GetGridCoordinate().y == range.y)
+                    if (tile->GetGridCoordinate().x == range.x && tile->GetGridCoordinate().y == range.y)
                     {
                         // TraceLog(LOG_INFO, "PLAYER IS AT [%f, %f]", PLAYER_GRID_COORDINATE.x, PLAYER_GRID_COORDINATE.y);
-                        DrawTexturePro(texture, source, tile.GetRectangle(), {}, 0.0f, GREEN);
+                        DrawTexturePro(texture, source, tile->GetRectangle(), {}, 0.0f, GREEN);
                     }
                 }
 
-                if (CheckCollisionPointRec(GetMousePosition(), tile.GetRectangle()) && !tileDetailsDrawn)
+                if (CheckCollisionPointRec(GetMousePosition(), tile->GetRectangle()) && !tileDetailsDrawn)
                 {
-                    DisplayTileDetails(tile);
+                    DisplayTileDetails(*tile);
                     tileDetailsDrawn = true; // Only show details for the first hovered tile
                 }
             }

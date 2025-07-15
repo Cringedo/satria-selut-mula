@@ -16,11 +16,11 @@ public:
 
     // ---- [Properties] ----
 
-    float getDamage() const;
+    float GetDamage() const;
     void setDamage(float newDamage);
 
-    float getHealth() const;
-    void setHealth(float newHealth);
+    float GetHealth() const;
+    void SetHealth(float newHealth);
 
     float getRange() const;
     void setRange(float newRange);
@@ -55,7 +55,7 @@ protected:
     Rectangle dest;
     Texture2D texture;
     Rectangle source;
-
+ 
 };
 
 class Player : public Entity

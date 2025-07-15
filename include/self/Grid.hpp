@@ -3,6 +3,7 @@
 #include <self/Entity.hpp>
 #include <self/GameObject.hpp>
 
+#include <memory>
 #include <vector>
 #include <utility>
 #include <raylib.h>
@@ -23,14 +24,14 @@ public:
     void PlaceEntityByGridCoordinate(Entity &e, int i, int j);
     void PlaceMonsterByGridCoordinate(Monster &m, int i, int j);
     void PlacePlayerByGridCoordinate(Player &p, int i, int j);
-    Tile *GetTileByGridCoordinate(int i, int j);
+    Tile* GetTileByGridCoordinate(int i, int j);
     Vector2 GetRandomSafeTile();
     bool CheckForTile(Vector2 coord);
 
 private:
     int height;
     int width;
-    std::vector<std::vector<Tile>> tiles;
+    std::vector<std::vector<std::unique_ptr<Tile>>> tiles;
 };
 
 enum class TileType
@@ -55,8 +56,13 @@ public:
     void SetTileType(TileType type) { this->type = type; }
     TileType GetTileType() const { return type; }
 
+    void SetEntity(unique_ptr<Entity> entity) { this->entity = std::move(entity); }
+    void ClearEntity() { this->entity.reset(); }
+    const unique_ptr<Entity>& GetEntity() const { return entity; }
+
 private:
     Rectangle rectangle;
     float noiseValue;
     TileType type;
+    std::unique_ptr<Entity> entity; // Optional: if you want to associate an Entity with the Tile
 };

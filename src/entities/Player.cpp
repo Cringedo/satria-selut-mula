@@ -26,7 +26,7 @@ Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity(n
     SetIsoCoordinate(dest);
 
     setRange(1);
-    setHealth(5);
+    SetHealth(5);
     setDamage(1);
 }
 

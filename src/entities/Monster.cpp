@@ -33,6 +33,8 @@ Monster::Monster(
 
     cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << endl;
     cout << texture.id << " - " << texture.width << "x" << texture.height << endl;
+
+    SetHealth(baseHealthVal);
 }
 
 Monster::Monster(const Monster &other)

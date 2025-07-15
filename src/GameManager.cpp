@@ -106,8 +106,7 @@ void GameManager::Update(float dt)
             }
         }
         PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); // Keep global in sync
-        cout << "Slime Grid Coordinate: " << monstersPtr[0]->GetGridCoordinate().x << ", " << monstersPtr[0]->GetGridCoordinate().y << endl;
-        cout << "Slime Destination Coordinate: " << monstersPtr[0]->GetPosition().x << ", " << monstersPtr[0]->GetPosition().y << endl;
+
         // Check for game over condition
         // if (playerPtr->IsDead()) ChangeState(GameState::GAMEOVER);
         if (IsKeyPressed(KEY_P))
@@ -250,14 +249,13 @@ bool GameManager::LoadMonsterData(const string &filePath)
             {
                 TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
                 monsterTemplateMap[id] = make_unique<GreenSlime>(
-                id, name, levelMin, levelMax,
-                baseHealth, baseDamage, goldDrop, spawnWeight);
+                    id, name, levelMin, levelMax,
+                    baseHealth, baseDamage, goldDrop, spawnWeight);
             }
             else
             {
                 TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
             }
-            
         }
         std::cout << "Successfully loaded " << monstersTemplate.size() << " monster templates from " << filePath << std::endl;
         return true;
@@ -312,7 +310,18 @@ void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEn
     for (size_t i = 0; i < drawableEntities.size(); ++i)
     {
         const Entity *entity = drawableEntities[i];
-        DrawText(TextFormat("%zu: %s", i, entity->GetName().c_str()),
+
+        // Check if the entity is a Player or Monster
+        if (dynamic_cast<const Monster *>(entity))
+        {
+            const Monster *monster = static_cast<const Monster *>(entity);
+            DrawText(TextFormat("%zu: %s [%0.f]", i, monster->GetName().c_str(), monster->GetHealth()),
+                     10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
+
+            continue;
+        }
+
+        DrawText(TextFormat("%zu: %s [%0.f]", i, entity->GetName().c_str()),
                  10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
     }
 }

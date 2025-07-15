@@ -14,7 +14,7 @@ string Entity::GetName() const
     return name;
 }
 
-float Entity::getDamage() const
+float Entity::GetDamage() const
 {
     return damage;
 }
@@ -24,12 +24,12 @@ void Entity::setDamage(float newDamage)
     damage = newDamage;
 }
 
-float Entity::getHealth() const
+float Entity::GetHealth() const
 {
     return health;
 }
 
-void Entity::setHealth(float newHealth)
+void Entity::SetHealth(float newHealth)
 {
     health = newHealth;
 }
