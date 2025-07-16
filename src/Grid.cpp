@@ -140,12 +140,11 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
     // TraceLog(LOG_INFO, "tile type: %zu", tile->GetTileType());
     if(tile->GetTileType() == TileType::MONSTER_TILE)
     {
-        TraceLog(LOG_INFO, "Player %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", player.GetName(), i, j, player.GetGridCoordinate().x, player.GetGridCoordinate().y);
+        // TraceLog(LOG_INFO, "Player %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", player.GetName(), i, j, player.GetGridCoordinate().x, player.GetGridCoordinate().y);
 
         Monster* monster = dynamic_cast<Monster*>(tile->GetEntity());
-        TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
         monster->SetHealth(monster->GetHealth() - player.GetDamage());
-        TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
+        // TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
 
         return;
     }
@@ -257,6 +256,11 @@ void Grid::Draw()
     }
 }
 
+
+// ======================
+// TILE Section
+// ======================
+
 void DisplayTileDetails(const Tile &tile)
 {
     std::ostringstream details;
@@ -270,9 +274,6 @@ void DisplayTileDetails(const Tile &tile)
 
     DrawText(details.str().c_str(), debugPanelSize.x + padding, debugPanelSize.y + padding, textSize, BLUE);
 }
-
-// ======================
-// TILE Section
 
 Tile::Tile(Rectangle rectangle, float noiseValue, TileType type) : rectangle(rectangle), noiseValue(noiseValue), type(type), GameObject({})
 {
