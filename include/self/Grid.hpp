@@ -24,7 +24,7 @@ public:
     void PlaceEntityByGridCoordinate(Entity &e, int i, int j);
     void PlaceMonsterByGridCoordinate(Monster &m, int i, int j);
     void PlacePlayerByGridCoordinate(Player &p, int i, int j);
-    Tile* GetTileByGridCoordinate(int i, int j);
+    Tile *GetTileByGridCoordinate(int i, int j);
     Vector2 GetRandomSafeTile();
     bool CheckForTile(Vector2 coord);
 
@@ -41,7 +41,7 @@ enum class TileType
     MONSTER_TILE,
     ITEM_TILE,
     PLAYER_TILE,
-    EMPTY_TILE 
+    EMPTY_TILE
 };
 
 class Tile : public GameObject
@@ -56,13 +56,14 @@ public:
     void SetTileType(TileType type) { this->type = type; }
     TileType GetTileType() const { return type; }
 
-    void SetEntity(unique_ptr<Entity> entity) { this->entity = std::move(entity); }
-    void ClearEntity() { this->entity.reset(); }
-    const unique_ptr<Entity>& GetEntity() const { return entity; }
+    void SetEntity(Entity *e) { this->entity = e; }    // Takes a raw pointer
+    void ClearEntity() { this->entity = nullptr; }     // Clears the raw pointer
+    Entity *GetEntity() { return entity; }             // Non-const: for modifying the entity
+    const Entity *GetEntity() const { return entity; } // Const overload: for read-only access
 
 private:
     Rectangle rectangle;
     float noiseValue;
     TileType type;
-    std::unique_ptr<Entity> entity; // Optional: if you want to associate an Entity with the Tile
+    Entity *entity = nullptr; // Pointer to the entity on this tile
 };

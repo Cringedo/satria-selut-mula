@@ -315,6 +315,7 @@ void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEn
         if (dynamic_cast<const Monster *>(entity))
         {
             const Monster *monster = static_cast<const Monster *>(entity);
+            // FIXME: why the health not updated accordingly
             DrawText(TextFormat("%zu: %s [%0.f]", i, monster->GetName().c_str(), monster->GetHealth()),
                      10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
 
