@@ -7,7 +7,8 @@
     "baseHealth": 20,
     "baseDamage": 5,
     "goldDrop": 5,
-    "spawnWeight": 0.8
+    "spawnWeight": 0.8,
+    "speed": 1.0
   },
   {
     "id": "orc",
@@ -17,7 +18,8 @@
     "baseHealth": 50,
     "baseDamage": 15,
     "goldDrop": 15,
-    "spawnWeight": 0.15
+    "spawnWeight": 0.15,
+    "speed": 0.8
   },
   {
     "id": "ogre",
@@ -27,7 +29,8 @@
     "baseHealth": 150,
     "baseDamage": 30,
     "goldDrop": 50,
-    "spawnWeight": 0.05
+    "spawnWeight": 0.05,
+    "speed": 0.5
   },
   {
     "id": "green_slime",
@@ -37,6 +40,7 @@
     "baseHealth": 10,
     "baseDamage": 2,
     "goldDrop": 5,
-    "spawnWeight": 1.0
+    "spawnWeight": 1.0,
+    "speed": 1.0
   }
 ]

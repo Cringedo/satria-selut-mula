@@ -20,10 +20,13 @@ public:
     void setDamage(float newDamage);
 
     float GetHealth() const;
-    void SetHealth(float newHealth);
+    void setHealth(float newHealth);
 
     float getRange() const;
     void setRange(float newRange);
+
+    float getSpeed() const;
+    void setSpeed(float newSpeed);
 
     // ---- [Position and Grid Coordinate] ----
 
@@ -49,6 +52,7 @@ protected:
     float damage;
     float health;
     float range;
+    float speed;
 
     Vector2 position;
     Vector2 gridCoordinate;

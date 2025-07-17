@@ -143,7 +143,7 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
         // TraceLog(LOG_INFO, "Player %s  is placed at [%d, %d] | Previously: [%0.f, %0.f]", player.GetName(), i, j, player.GetGridCoordinate().x, player.GetGridCoordinate().y);
 
         Monster* monster = dynamic_cast<Monster*>(tile->GetEntity());
-        monster->SetHealth(monster->GetHealth() - player.GetDamage());
+        monster->setHealth(monster->GetHealth() - player.GetDamage());
         // TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
 
         return;

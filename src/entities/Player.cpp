@@ -26,8 +26,9 @@ Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity(n
     SetIsoCoordinate(dest);
 
     setRange(1);
-    SetHealth(5);
+    setHealth(5);
     setDamage(1);
+    setSpeed(1.0f); 
 }
 
 void Player::SetGridPosition(float x, float y)

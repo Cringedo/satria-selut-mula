@@ -29,7 +29,7 @@ float Entity::GetHealth() const
     return health;
 }
 
-void Entity::SetHealth(float newHealth)
+void Entity::setHealth(float newHealth)
 {
     health = newHealth;
 }
@@ -42,6 +42,16 @@ float Entity::getRange() const
 void Entity::setRange(float newRange)
 {
     range = newRange;
+}
+
+float Entity::getSpeed() const
+{
+    return speed;
+}
+
+void Entity::setSpeed(float newSpeed)
+{
+    speed = newSpeed;
 }
 
 void Entity::SetPosition(float x, float y)
