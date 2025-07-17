@@ -3,6 +3,8 @@
 #include <self/Entity.hpp>
 #include <self/Grid.hpp>
 
+#include <self/TurnManager.hpp>
+
 #include <string>
 #include <memory>
 #include <map>
@@ -34,6 +36,8 @@ public:
     void ChangeState(GameState newState);
     bool LoadMonsterData(const string &filePath);
 
+    void AddEntity(std::unique_ptr<Entity> entity);
+
     Player *GetPlayer() { return playerPtr.get(); }
     Grid *GetGrid() { return gridPtr.get(); }
 
@@ -42,6 +46,7 @@ private:
     ~GameManager();
 
     GameState currentState;
+    TurnManager turnManager;
 
     // all monsters configured are loaded by LoadMonsterData() into this
     vector<unique_ptr<Monster>>monstersTemplate; 
@@ -50,6 +55,8 @@ private:
     vector<unique_ptr<Monster>> monstersPtr;
     unique_ptr<Player> playerPtr;
     unique_ptr<Grid> gridPtr;
+
+    vector<Entity *> entities;
 
     void EnterState(GameState state);
     void ExitState(GameState state);

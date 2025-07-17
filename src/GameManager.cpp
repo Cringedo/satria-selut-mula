@@ -44,6 +44,7 @@ void GameManager::Init()
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
     PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate();
 
+    entities.push_back(playerPtr.get());
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // ----- Mobs Spawn -------
@@ -58,7 +59,12 @@ void GameManager::Init()
         TraceLog(LOG_INFO, "[GameManager]: Spawning monster %s", monster->GetName().c_str());
         monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
         gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
+
+        entities.push_back(monster.get());
     }
+
+    // ----- Turn Manager Initialization -------
+    turnManager.Setup(entities);
 
     ChangeState(GameState::MENU);
 }
@@ -297,6 +303,14 @@ void GameManager::ExitState(GameState state)
         // Actions when exiting MENU state (e.g., hide menu elements)
         break;
         // ... handle other states
+    }
+}
+
+void GameManager::AddEntity(std::unique_ptr<Entity> entity)
+{
+    if (entity)
+    {
+        entities.push_back(entity.get());
     }
 }
 

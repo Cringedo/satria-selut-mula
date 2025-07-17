@@ -118,7 +118,8 @@ package: release
 	$(MKDIR) $(call platformpth, $(buildDir)/resources)
 
 	# Copy resources from the 'resources' directory to the build directory NEED MANUALLY TO DO
-	-robocopy "$(call platformpth,resources)" "$(call platformpth,$(buildDir)/resources)" *.*
+# 	-robocopy "$(call platformpth,resources)" "$(call platformpth,$(buildDir)/resources)" *.*
+	xcopy D:\Developments\Games\satria-selut-mula\resources\ D:\Developments\Games\satria-selut-mula\bin\resources\ /E /I /Y
 	@echo robocopy $(subst /,\,$(CURDIR)/resources) $(subst /,\,$(CURDIR)/$(buildDir)/resources) /E
 
 ifeq ($(OS), Windows_NT)

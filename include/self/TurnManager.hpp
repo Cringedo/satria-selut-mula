@@ -10,22 +10,25 @@ enum class TurnState
     MONSTER_TURN
 };
 
-class TurnManager {
-    public: 
-        TurnManager();
-        void StartTurn();
-        void EndTurn();
+class TurnManager
+{
+public:
+    TurnManager();
 
-        TurnState GetCurrentTurnState() const { return currentTurnState; }
-        void SetCurrentEntity(Entity* entity) { currentEntity = entity; }
-        Entity* GetCurrentEntity() const { return currentEntity; }
-        void AddEntity(Entity* entity) { entities.push_back(entity); }
-        void RemoveEntity(Entity* entity) {
-            entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
-        }
+    void Setup(std::vector<Entity *> initialEntities);
 
-    private:
-        TurnState currentTurnState;
-        Entity* currentEntity; 
-        std::vector<Entity*> entities;
+    void StartTurn();
+    void EndTurn();
+
+    TurnState GetCurrentTurnState() const { return currentTurnState; }
+    void SetCurrentEntity(Entity *entity) { currentEntity = entity; }
+    Entity *GetCurrentEntity() const { return currentEntity; }
+    void AddEntity(Entity *entity) { entities.push_back(entity); }
+    void RemoveEntity(Entity *entity);
+    const std::vector<Entity *> &GetEntities() const { return entities; }
+
+private:
+    TurnState currentTurnState;
+    Entity *currentEntity;
+    std::vector<Entity *> entities;
 };
