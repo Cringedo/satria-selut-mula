@@ -5,7 +5,7 @@
 #include <self/Entity.hpp>
 #include <self/GameObject.hpp>
 
-Entity::Entity(string name) : name(name), GameObject({})
+Entity::Entity(string name, float speed) : name(name), speed(speed), GameObject({})
 {
 }
 

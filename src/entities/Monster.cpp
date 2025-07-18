@@ -12,9 +12,10 @@ Monster::Monster(
     float baseHealthVal,
     float baseDamageVal,
     int goldDropVal,
-    float spawnWeightVal)
+    float spawnWeightVal,
+    float speedVal)
     : id(idVal),
-      Entity(nameVal),
+      Entity(nameVal, speedVal),
       levelMin(levelMinVal),
       levelMax(levelMaxVal),
       baseHealth(baseHealthVal),
@@ -22,28 +23,36 @@ Monster::Monster(
       goldDrop(goldDropVal),
       spawnWeight(spawnWeightVal)
 {
-    Image image = LoadImage("resources/sprites/player_template.png");
-    texture = LoadTextureFromImage(image);
-    UnloadImage(image);
+    // Initialize the texture and source rectangle for drawing
+    source = {0, 0, 0, 0};       // Will be set later after loading the image
+    dest = {0, 0, SCALE, SCALE}; // Default destination rectangle size
 
-    source.x = 0;
-    source.y = 0;
-    source.width = (float)texture.width;
-    source.height = (float)texture.height;
+    // Load the monster texture from an image file
+    {
+        Image image = LoadImage("resources/sprites/player_template.png");
+        texture = LoadTextureFromImage(image);
+        UnloadImage(image);
 
-    cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << endl;
-    cout << texture.id << " - " << texture.width << "x" << texture.height << endl;
+        source.x = 0;
+        source.y = 0;
+        source.width = (float)texture.width;
+        source.height = (float)texture.height;
 
-    setHealth(baseHealthVal);
+        cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << endl;
+        cout << texture.id << " - " << texture.width << "x" << texture.height << endl;
+
+        setHealth(baseHealthVal);
+        setSpeed(speedVal);
+    }
 }
 
 Monster::Monster(const Monster &other)
-    : Entity(other.name),
+    : Entity(other.name, other.speed),
       levelMin(other.levelMin), levelMax(other.levelMax),
       baseHealth(other.baseHealth), baseDamage(other.baseDamage),
       goldDrop(other.goldDrop), spawnWeight(other.spawnWeight)
 {
-    Image image = LoadImage("resources/sprites/player_template.png"); // Temporary picture
+    Image image = LoadImage("resources/sprites/player_template.png"); 
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
 }
@@ -134,7 +143,6 @@ void Monster::Draw()
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
 
-
 // ======== [Monster Subclass ] ========
 
 // -----[Green Slime]-------
@@ -146,8 +154,9 @@ GreenSlime::GreenSlime(
     float baseHealthVal,
     float baseDamageVal,
     int goldDropVal,
-    float spawnWeightVal)
-    : Monster(idVal, nameVal, levelMinVal, levelMaxVal, baseHealthVal, baseDamageVal, goldDropVal, spawnWeightVal)
+    float spawnWeightVal,
+    float speedVal)
+    : Monster(idVal, nameVal, levelMinVal, levelMaxVal, baseHealthVal, baseDamageVal, goldDropVal, spawnWeightVal, speedVal)
 {
     Image image = LoadImage("resources/sprites/green_slime.png");
     texture = LoadTextureFromImage(image);

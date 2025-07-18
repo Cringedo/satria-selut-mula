@@ -11,7 +11,7 @@ using namespace std;
 class Entity : public GameObject
 {
 public:
-    Entity(string Name);
+    Entity(string Name, float speed);
     string GetName() const;
 
     // ---- [Properties] ----
@@ -40,7 +40,6 @@ public:
 
     // ---- [Interface] ----
 
-
     // ---- [Drawing] ----
 
     virtual void Draw() = 0;
@@ -59,13 +58,12 @@ protected:
     Rectangle dest;
     Texture2D texture;
     Rectangle source;
- 
 };
 
 class Player : public Entity
 {
 public:
-    Player(float x, float y, std::string n);
+    Player(float x, float y, std::string n, float s);
     Vector2 GetGridCoordinate() const;
     Vector2 GetPosition();
     void SetGridPosition(float x, float y);
@@ -95,7 +93,8 @@ public:
         float baseHealthVal,
         float baseDamageVal,
         int goldDropVal,
-        float spawnWeightVal);
+        float spawnWeightVal,
+        float speedVal);
 
     Monster(const Monster &other);
 
@@ -142,7 +141,8 @@ public:
                float baseHealthVal,
                float baseDamageVal,
                int goldDropVal,
-               float spawnWeightVal);
+               float spawnWeightVal,
+               float speedVal);
 
     void Draw() override;
 };

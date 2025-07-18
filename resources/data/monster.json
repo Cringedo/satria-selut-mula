@@ -41,6 +41,6 @@
     "baseDamage": 2,
     "goldDrop": 5,
     "spawnWeight": 1.0,
-    "speed": 1.0
+    "speed": 0.5
   }
 ]

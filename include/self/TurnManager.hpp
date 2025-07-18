@@ -27,6 +27,8 @@ public:
     void RemoveEntity(Entity *entity);
     const std::vector<Entity *> &GetEntities() const { return entities; }
 
+    void DisplayTurnOrder() const;
+
 private:
     TurnState currentTurnState;
     Entity *currentEntity;

@@ -36,7 +36,7 @@ void GameManager::Init()
     LoadMonsterData("resources/data/monster.json");
 
     // ----- Player and Grid Initialization -------
-    playerPtr = std::make_unique<Player>(0, 0, "PlayerOne");
+    playerPtr = std::make_unique<Player>(0, 0, "PlayerOne", 5.0f);
     gridPtr = std::make_unique<Grid>(GRID_HEIGHT, GRID_WIDTH);
     gridPtr->Generate();
 
@@ -157,6 +157,7 @@ void GameManager::Draw()
               });
 
     DisplayDrawEntityOrder(drawableEntities);
+    turnManager.DisplayTurnOrder();
 
     // Drawing logic based on current state
     switch (currentState)
@@ -238,12 +239,13 @@ bool GameManager::LoadMonsterData(const string &filePath)
             float baseDamage = monsterJson.at("baseDamage").get<float>();
             int goldDrop = monsterJson.at("goldDrop").get<int>();
             float spawnWeight = monsterJson.at("spawnWeight").get<float>();
+            float speed = monsterJson.value("speed", 1.0f); // Default speed if not provided
 
             // Create Monster object and add to vector
             monstersTemplate.emplace_back(
                 make_unique<Monster>(
                     id, name, levelMin, levelMax,
-                    baseHealth, baseDamage, goldDrop, spawnWeight));
+                    baseHealth, baseDamage, goldDrop, spawnWeight, speed));
 
             // monstersTemplate.emplace_back(
             //     id, name, levelMin, levelMax,
@@ -256,7 +258,7 @@ bool GameManager::LoadMonsterData(const string &filePath)
                 TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
                 monsterTemplateMap[id] = make_unique<GreenSlime>(
                     id, name, levelMin, levelMax,
-                    baseHealth, baseDamage, goldDrop, spawnWeight);
+                    baseHealth, baseDamage, goldDrop, spawnWeight, speed);
             }
             else
             {
@@ -325,18 +327,18 @@ void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEn
     {
         const Entity *entity = drawableEntities[i];
 
+        // FIXME: instead of using children class, we could perhaps have it to be wrapped into only the parent class, Entity for the properties
         // Check if the entity is a Player or Monster
         if (dynamic_cast<const Monster *>(entity))
         {
             const Monster *monster = static_cast<const Monster *>(entity);
-            // FIXME: why the health not updated accordingly
-            DrawText(TextFormat("%zu: %s [%0.f]", i, monster->GetName().c_str(), monster->GetHealth()),
+            DrawText(TextFormat("%zu: %s [%0.f] | Speed: [%0.f]", i, monster->GetName().c_str(), monster->GetHealth(), monster->getSpeed()),
                      10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
 
             continue;
         }
 
-        DrawText(TextFormat("%zu: %s [%0.f]", i, entity->GetName().c_str()),
+        DrawText(TextFormat("%zu: %s [%0.f]", i, entity->GetName().c_str(), entity->GetHealth(), entity->getSpeed()),
                  10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
     }
 }

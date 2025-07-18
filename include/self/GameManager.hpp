@@ -63,5 +63,6 @@ private:
     
     void MovePlayer(int dx, int dy);
     void DrawEntities(const std::vector<Entity *> &entities);
+
     void DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEntities);
 };
