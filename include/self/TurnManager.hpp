@@ -17,12 +17,13 @@ public:
     TurnManager();
 
     void Setup(std::vector<Entity *> initialEntities);
+    void Setup();
 
     void StartTurn();
     void EndTurn();
 
     TurnState GetCurrentTurnState() const { return currentTurnState; }
-    void setCurrentTurnState(TurnState state) { currentTurnState = state; }
+    void SetCurrentTurnState(TurnState state) { currentTurnState = state; }
 
     void GetNextEntity();
 
