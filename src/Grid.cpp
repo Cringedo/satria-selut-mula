@@ -146,6 +146,19 @@ void Grid::PlacePlayerByGridCoordinate(Player &player, int i, int j)
         monster->setHealth(monster->GetHealth() - player.GetDamage());
         // TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
 
+        if (monster->GetHealth() <= 0)
+        {
+            TraceLog(LOG_INFO, "Monster %s has been defeated!", monster->GetName().c_str());
+            tile->SetTileType(TileType::SAFE_TILE);
+            tile->ClearEntity();
+            player.setHealth(player.GetHealth());
+            TraceLog(LOG_INFO, "Player %s gained health from defeating monster %s", player.GetName().c_str(), monster->GetName().c_str());
+        }
+        else
+        {
+            TraceLog(LOG_INFO, "Player %s attacked monster %s at [%d, %d]. Monster health: %0.f", player.GetName().c_str(), monster->GetName().c_str(), i, j, monster->GetHealth());
+        }
+
         return;
     }
 

@@ -32,6 +32,12 @@ float Entity::GetHealth() const
 void Entity::setHealth(float newHealth)
 {
     health = newHealth;
+
+    if (health <= 0)
+    {
+        health = 0;
+        TraceLog(LOG_INFO, "Entity %s has been defeated.", name.c_str());
+    }
 }
 
 float Entity::getRange() const

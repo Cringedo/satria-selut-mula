@@ -43,6 +43,8 @@ Monster::Monster(
 
         setHealth(baseHealthVal);
         setSpeed(speedVal);
+
+        isDead = false; 
     }
 }
 
@@ -58,6 +60,18 @@ Monster::Monster(const Monster &other)
 }
 
 // ---- [Properties] ----
+
+void Monster::setHealth(float newHealth)
+{
+    health = newHealth;
+
+    if (health <= 0)
+    {
+        health = 0;
+        TraceLog(LOG_INFO, "Monster %s has been defeated.", name.c_str());
+        isDead = true; 
+    }
+}
 
 int Monster::getLevelMin() const
 {
@@ -140,6 +154,12 @@ void Monster::Draw()
     // cout << " texture: " << texture.id << " - " << texture.width << "x" << texture.height << endl;
     // cout << "--------- Monster: " << dest.x << "," << dest.y << endl;
     // cout << Entity::GetName() << " is at " << source.x << ", " << source.y << endl;
+    if(isDead)
+    {
+        // If the monster's health is zero or less, it should not be drawn
+        return;
+    }
+    
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
 
@@ -171,10 +191,10 @@ GreenSlime::GreenSlime(
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
 }
 
-void GreenSlime::Draw()
-{
-    DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
-}
+// void GreenSlime::Draw()
+// {
+//     DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
+// }
 
 // TODO: Implement other monster subclasses
 

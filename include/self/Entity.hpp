@@ -20,7 +20,7 @@ public:
     void setDamage(float newDamage);
 
     float GetHealth() const;
-    void setHealth(float newHealth);
+    virtual void setHealth(float newHealth);
 
     float getRange() const;
     void setRange(float newRange);
@@ -99,6 +99,8 @@ public:
 
     // ---- [Properties] ----
 
+    void setHealth(float newHealth) override;
+
     virtual int getLevelMin() const;
     virtual int getLevelMax() const;
     virtual float getBaseHealth() const;
@@ -129,6 +131,7 @@ private:
     float baseDamage;
     int goldDrop;
     float spawnWeight;
+    bool isDead = false;
 };
 
 // ------- [Green Slime] --------
@@ -145,5 +148,5 @@ public:
                float spawnWeightVal,
                float speedVal);
 
-    void Draw() override;
+    // void Draw() override;
 };

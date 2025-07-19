@@ -65,6 +65,14 @@ void TurnManager::Setup(std::vector<Entity *> initialEntities)
 
 void TurnManager::Setup()
 {
+    entities.erase(std::remove_if(entities.begin(), entities.end(), [](Entity *entity)
+                   {
+                       TraceLog(LOG_INFO, "Checking entity: %s with health %f (%zu)", entity->GetName().c_str(), entity->GetHealth(), entity->GetHealth() <= 0);
+                       return entity->GetHealth() <= 0;
+                   }), entities.end());
+
+    TraceLog(LOG_INFO, "TurnManager setup with %d entities after cleanup.", entities.size());
+
     std::sort(entities.begin(), entities.end(), [](Entity *a, Entity *b)
               { return a->getSpeed() > b->getSpeed(); });
 
@@ -100,7 +108,10 @@ void TurnManager::GetNextEntity()
                 SetCurrentTurnState(TurnState::CALCULATE_TURN);
                 TraceLog(LOG_INFO, "Calculating next entity.");
             }
-            currentEntity = *it;
+            else
+            {
+                currentEntity = *it;
+            }
         }
         else
         {
@@ -120,7 +131,8 @@ void TurnManager::GetNextEntity()
         TraceLog(LOG_INFO, "Calculating next entity based on speed.");
         Setup();
     }
-    else if (dynamic_cast<const Player *>(currentEntity))
+
+    if (dynamic_cast<const Player *>(currentEntity))
     {
         currentTurnState = TurnState::PLAYER_TURN;
     }
