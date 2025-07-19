@@ -29,6 +29,7 @@ Player::Player(float x, float y, string n, float s) : position({x, y}), Entity(n
     setHealth(5);
     setDamage(10);
     setSpeed(s); 
+    // SetActionPoints(1);
 }
 
 void Player::SetGridPosition(float x, float y)

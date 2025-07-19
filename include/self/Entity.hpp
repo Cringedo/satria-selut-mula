@@ -28,6 +28,9 @@ public:
     float getSpeed() const;
     void setSpeed(float newSpeed);
 
+    // int GetActionPoints() const { return actionPoints; }
+    // void SetActionPoints(int points) { actionPoints = points; }
+
     // ---- [Position and Grid Coordinate] ----
 
     virtual void SetPosition(float x, float y);
@@ -52,6 +55,7 @@ protected:
     float health;
     float range;
     float speed;
+    // int actionPoints;
 
     Vector2 position;
     Vector2 gridCoordinate;
@@ -111,6 +115,11 @@ public:
 
     float calculateHealthAtLevel(int level) const;
 
+    // ---- [Action Logic] ----
+    // TODO: START HERE FOR THE LOGIC
+    // virtual void Move ();
+    // virtual void Attack(Entity &target);
+
 
     // ---- [Position and Grid Coordinate] ----
     // Override to provide specific behavior for monsters
@@ -123,7 +132,7 @@ public:
 
     void Draw();
 
-private:
+protected:
     std::string id;
     int levelMin;
     int levelMax;
@@ -147,6 +156,9 @@ public:
                int goldDropVal,
                float spawnWeightVal,
                float speedVal);
+
+    void Move();
+    void Attack(Entity &target);
 
     // void Draw() override;
 };

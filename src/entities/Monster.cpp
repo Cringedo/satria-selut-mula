@@ -43,6 +43,7 @@ Monster::Monster(
 
         setHealth(baseHealthVal);
         setSpeed(speedVal);
+        // SetActionPoints(1);
 
         isDead = false; 
     }
@@ -189,6 +190,23 @@ GreenSlime::GreenSlime(
 
     std::cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << std::endl;
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
+}
+
+void GreenSlime::Move()
+{
+    // Implement the movement logic for Green Slime
+    // For example, it could move towards the player or randomly within a certain range
+}
+
+void GreenSlime::Attack(Entity &target)
+{
+    // Implement the attack logic for Green Slime
+    // For example, it could deal damage to the target entity
+    if (!isDead)
+    {
+        target.setHealth(target.GetHealth() - baseDamage);
+        TraceLog(LOG_INFO, "Green Slime attacks %s for %.2f damage.", target.GetName().c_str(), baseDamage);
+    }
 }
 
 // void GreenSlime::Draw()
