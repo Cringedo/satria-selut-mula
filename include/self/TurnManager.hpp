@@ -24,8 +24,11 @@ public:
     TurnState GetCurrentTurnState() const { return currentTurnState; }
     void setCurrentTurnState(TurnState state) { currentTurnState = state; }
 
+    void GetNextEntity();
+
     void SetCurrentEntity(Entity *entity) { currentEntity = entity; }
     Entity *GetCurrentEntity() const { return currentEntity; }
+
     void AddEntity(Entity *entity) { entities.push_back(entity); }
     void RemoveEntity(Entity *entity);
     const std::vector<Entity *> &GetEntities() const { return entities; }

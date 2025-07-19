@@ -51,7 +51,7 @@ void GameManager::Init()
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
 
-    // Temp: just spawn 2 monsters
+    // TODO: just spawn 2 monsters
     monstersPtr.emplace_back(move(monsterTemplateMap["green_slime"]));
     monstersPtr.emplace_back(move(monstersTemplate[1]));
     for (unique_ptr<Monster> &monster : monstersPtr)
@@ -102,7 +102,7 @@ void GameManager::Update(float dt)
 
         case TurnState::MONSTER_TURN:
             turnManager.GetCurrentEntity();
-            turnManager.EndTurn();
+            // turnManager.GetNextEntity();
 
             break;
 
@@ -122,6 +122,10 @@ void GameManager::Update(float dt)
             break;
         }
 
+        if (IsKeyPressed(KEY_B))
+        {
+            turnManager.GetNextEntity();
+        }
 
         if (IsKeyPressed(KEY_Z))
         {
@@ -387,5 +391,5 @@ void GameManager::MovePlayer(int dx, int dy)
     }
 
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
-    turnManager.EndTurn();
+    turnManager.GetNextEntity();
 }

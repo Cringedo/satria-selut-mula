@@ -75,7 +75,6 @@ protected:
     Vector2 position;
     Vector2 gridCoordinate;
     Rectangle dest;
-    string name;
     int health;
     Texture2D texture;
     Rectangle source;
@@ -106,8 +105,10 @@ public:
     virtual float getBaseDamage() const;
     virtual int getGoldDrop() const;
     virtual float getSpawnWeight() const;
+    virtual float getSpeed() const { return speed; }
 
     float calculateHealthAtLevel(int level) const;
+
 
     // ---- [Position and Grid Coordinate] ----
     // Override to provide specific behavior for monsters

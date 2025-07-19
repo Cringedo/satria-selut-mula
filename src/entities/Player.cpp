@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Player::Player(float x, float y, string n, float s) : position({x, y}), name(n), Entity(n, s) 
+Player::Player(float x, float y, string n, float s) : position({x, y}), Entity(n, s) 
 {
     TraceLog(LOG_INFO, "Player (%s) has been created at [%0.0f, %0.0f]", n, position.x, position.y);
     Image image = LoadImage("resources/sprites/player_template.png");
