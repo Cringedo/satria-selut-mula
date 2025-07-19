@@ -5,6 +5,29 @@
 
 TurnManager::TurnManager() {
     std::cout << "TurnManager initialized." << std::endl;
+
+}
+
+void TurnManager::StartTurn() {
+    if (currentTurnState == TurnState::PLAYER_TURN) {
+        TraceLog(LOG_INFO, "Starting player turn.");
+    } else if (currentTurnState == TurnState::MONSTER_TURN) {
+        TraceLog(LOG_INFO, "Starting monster turn.");
+    } else {
+        TraceLog(LOG_WARNING, "Unknown turn state. Cannot start turn.");
+    }
+}
+
+void TurnManager::EndTurn() {
+    if (currentTurnState == TurnState::PLAYER_TURN) {
+        TraceLog(LOG_INFO, "Ending player turn.");
+        currentTurnState = TurnState::MONSTER_TURN;
+    } else if (currentTurnState == TurnState::MONSTER_TURN) {
+        TraceLog(LOG_INFO, "Ending monster turn.");
+        currentTurnState = TurnState::PLAYER_TURN;
+    } else {
+        TraceLog(LOG_WARNING, "Unknown turn state. Cannot end turn.");
+    }
 }
 
 void TurnManager::Setup(std::vector<Entity *> initialEntities) {
@@ -15,13 +38,20 @@ void TurnManager::Setup(std::vector<Entity *> initialEntities) {
     std::sort(entities.begin(), entities.end(), [](Entity *a, Entity *b) {
         return a->getSpeed() > b->getSpeed(); 
     });
+
+    if (dynamic_cast<Monster *>(entities[0])) {
+        currentTurnState = TurnState::MONSTER_TURN;
+    } else {
+        currentTurnState = TurnState::PLAYER_TURN;
+    }
+
 }
 
 void TurnManager::DisplayTurnOrder() const {
     int yOffset = 10;
     int gap = 30;
 
-    DrawText("Turn Order:", 10, yOffset, 20, BLACK);
+    DrawText(TextFormat("Current Order: %s", currentTurnState == TurnState::PLAYER_TURN ? "Player" : "Monster"), 10, yOffset+5, 20, BLACK);
 
     yOffset += 30;
 

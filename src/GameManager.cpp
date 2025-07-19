@@ -84,19 +84,44 @@ void GameManager::Update(float dt)
         // Update menu elements, check for menu selections
         if (IsKeyPressed(KEY_ENTER))
         {
+        
             ChangeState(GameState::PLAYING);
         }
         break;
     case GameState::PLAYING:
+
         // TODO: we can have this to be based on the player movement speed
-        if (IsKeyPressed(KEY_RIGHT))
-            MovePlayer(1, 0);
-        if (IsKeyPressed(KEY_LEFT))
-            MovePlayer(-1, 0);
-        if (IsKeyPressed(KEY_UP))
-            MovePlayer(0, 1);
-        if (IsKeyPressed(KEY_DOWN))
-            MovePlayer(0, -1);
+
+        switch (turnManager.GetCurrentTurnState())
+        {
+        case TurnState::CALCULATE_TURN:
+            turnManager.StartTurn();
+            turnManager.SetCurrentEntity(nullptr);
+
+            break;
+
+        case TurnState::MONSTER_TURN:
+            turnManager.GetCurrentEntity();
+            turnManager.EndTurn();
+
+            break;
+
+        case TurnState::PLAYER_TURN:
+            turnManager.SetCurrentEntity(playerPtr.get());
+            if (IsKeyPressed(KEY_RIGHT))
+                MovePlayer(1, 0);
+            if (IsKeyPressed(KEY_LEFT))
+                MovePlayer(-1, 0);
+            if (IsKeyPressed(KEY_UP))
+                MovePlayer(0, 1);
+            if (IsKeyPressed(KEY_DOWN))
+                MovePlayer(0, -1);
+            break;
+
+        default:
+            break;
+        }
+
 
         if (IsKeyPressed(KEY_Z))
         {
@@ -362,4 +387,5 @@ void GameManager::MovePlayer(int dx, int dy)
     }
 
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
+    turnManager.EndTurn();
 }

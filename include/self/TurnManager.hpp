@@ -7,7 +7,8 @@
 enum class TurnState
 {
     PLAYER_TURN,
-    MONSTER_TURN
+    MONSTER_TURN, 
+    CALCULATE_TURN
 };
 
 class TurnManager
@@ -21,6 +22,8 @@ public:
     void EndTurn();
 
     TurnState GetCurrentTurnState() const { return currentTurnState; }
+    void setCurrentTurnState(TurnState state) { currentTurnState = state; }
+
     void SetCurrentEntity(Entity *entity) { currentEntity = entity; }
     Entity *GetCurrentEntity() const { return currentEntity; }
     void AddEntity(Entity *entity) { entities.push_back(entity); }
