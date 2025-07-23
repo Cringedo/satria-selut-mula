@@ -101,9 +101,17 @@ void GameManager::Update(float dt)
             break;
 
         case TurnState::MONSTER_TURN:
-            turnManager.GetCurrentEntity();
             // turnManager.GetNextEntity();
-
+            if (turnManager.GetCurrentEntity())
+            {
+                Monster *currentMonsterPtr = dynamic_cast<Monster *>(turnManager.GetCurrentEntity());
+                currentMonsterPtr->TakeAction();
+                turnManager.EndTurn();
+            }
+            else
+            {
+                TraceLog(LOG_WARNING, "No current entity to take action.");
+            }
             break;
 
         case TurnState::PLAYER_TURN:
@@ -289,10 +297,6 @@ bool GameManager::LoadMonsterData(const string &filePath)
             {
                 TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
                 // Create Monster object and add to vector
-                monstersTemplate.emplace_back(
-                    make_unique<Monster>(
-                        id, name, levelMin, levelMax,
-                        baseHealth, baseDamage, goldDrop, spawnWeight, speed));
             }
         }
         std::cout << "Successfully loaded " << monstersTemplate.size() << " monster templates from " << filePath << std::endl;

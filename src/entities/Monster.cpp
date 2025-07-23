@@ -115,6 +115,12 @@ float Monster::calculateHealthAtLevel(int level) const
     return baseHealth + (clampedLevel - levelMin) * 10.0f;
 }
 
+void Monster::TakeAction()
+{
+    TraceLog(LOG_INFO, "Monster %s is taking action.", name.c_str());
+}
+
+
 // ---- [Position and Grid Coordinate] ----
 
 Vector2 Monster::GetPosition() const
@@ -192,6 +198,13 @@ GreenSlime::GreenSlime(
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
 }
 
+void GreenSlime::TakeAction()
+{
+    // Implement specific action logic for Green Slime
+    // For example, move towards the player or attack
+    TraceLog(LOG_INFO, "Green Slime %s is taking action.", GetName().c_str());
+}
+
 // TODO: Implement other monster subclasses
 
 // ---- [Dark Green Slime] ----
@@ -219,5 +232,12 @@ DarkGreenSlime::DarkGreenSlime(
 
     std::cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << std::endl;
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
+}
+
+void DarkGreenSlime::TakeAction()
+{
+    // Implement specific action logic for Dark Green Slime
+    // For example, move towards the player or attack
+    TraceLog(LOG_INFO, "Dark Green Slime %s is taking action.", GetName().c_str());
 }
 // ---- [White Slime] ----

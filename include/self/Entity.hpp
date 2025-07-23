@@ -117,7 +117,7 @@ public:
 
     // ---- [Action Logic] ----
     // TODO: START HERE FOR THE LOGIC
-    // virtual void TakeAction() = 0; 
+    virtual void TakeAction() = 0;
 
     // ---- [Position and Grid Coordinate] ----
     // Override to provide specific behavior for monsters
@@ -155,7 +155,8 @@ public:
                float spawnWeightVal,
                float speedVal);
 
-    
+private:
+    void TakeAction() override;
 };
 
 // ------- [Dark Green Slime] --------
@@ -168,12 +169,11 @@ public:
                    int levelMinVal,
                    int levelMaxVal,
                    float baseHealthVal,
-               float baseDamageVal,
-               int goldDropVal,
-               float spawnWeightVal,
-               float speedVal);
+                   float baseDamageVal,
+                   int goldDropVal,
+                   float spawnWeightVal,
+                   float speedVal);
 
-    // void Draw() override;
+private:
+    void TakeAction() override;
 };
-
-
