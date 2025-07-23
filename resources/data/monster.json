@@ -42,5 +42,16 @@
     "goldDrop": 5,
     "spawnWeight": 1.0,
     "speed": 10
+  },
+  {
+    "id": "dark_green_slime",
+    "name": "Dark Green Slime",
+    "levelMin": 1,
+    "levelMax": 5,
+    "baseHealth": 12,
+    "baseDamage": 3,
+    "goldDrop": 6,
+    "spawnWeight": 0.9,
+    "speed": 9
   }
 ]

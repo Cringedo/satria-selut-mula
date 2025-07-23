@@ -117,9 +117,7 @@ public:
 
     // ---- [Action Logic] ----
     // TODO: START HERE FOR THE LOGIC
-    // virtual void Move ();
-    // virtual void Attack(Entity &target);
-
+    // virtual void TakeAction() = 0; 
 
     // ---- [Position and Grid Coordinate] ----
     // Override to provide specific behavior for monsters
@@ -157,8 +155,25 @@ public:
                float spawnWeightVal,
                float speedVal);
 
-    void Move();
-    void Attack(Entity &target);
+    
+};
+
+// ------- [Dark Green Slime] --------
+
+class DarkGreenSlime : public Monster
+{
+public:
+    DarkGreenSlime(const std::string &idVal,
+                   const std::string &nameVal,
+                   int levelMinVal,
+                   int levelMaxVal,
+                   float baseHealthVal,
+               float baseDamageVal,
+               int goldDropVal,
+               float spawnWeightVal,
+               float speedVal);
 
     // void Draw() override;
 };
+
+

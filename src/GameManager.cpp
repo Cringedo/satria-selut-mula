@@ -53,7 +53,7 @@ void GameManager::Init()
 
     // TODO: just spawn 2 monsters
     monstersPtr.emplace_back(move(monsterTemplateMap["green_slime"]));
-    monstersPtr.emplace_back(move(monstersTemplate[1]));
+    monstersPtr.emplace_back(move(monsterTemplateMap["dark_green_slime"]));
     for (unique_ptr<Monster> &monster : monstersPtr)
     {
         TraceLog(LOG_INFO, "[GameManager]: Spawning monster %s", monster->GetName().c_str());
@@ -84,7 +84,7 @@ void GameManager::Update(float dt)
         // Update menu elements, check for menu selections
         if (IsKeyPressed(KEY_ENTER))
         {
-        
+
             ChangeState(GameState::PLAYING);
         }
         break;
@@ -270,17 +270,6 @@ bool GameManager::LoadMonsterData(const string &filePath)
             float spawnWeight = monsterJson.at("spawnWeight").get<float>();
             float speed = monsterJson.value("speed", 1.0f); // Default speed if not provided
 
-            // Create Monster object and add to vector
-            monstersTemplate.emplace_back(
-                make_unique<Monster>(
-                    id, name, levelMin, levelMax,
-                    baseHealth, baseDamage, goldDrop, spawnWeight, speed));
-
-            // monstersTemplate.emplace_back(
-            //     id, name, levelMin, levelMax,
-            //     baseHealth, baseDamage, goldDrop, spawnWeight
-            // );
-
             // Store a pointer to the newly added template monster
             if (id == "green_slime")
             {
@@ -289,9 +278,21 @@ bool GameManager::LoadMonsterData(const string &filePath)
                     id, name, levelMin, levelMax,
                     baseHealth, baseDamage, goldDrop, spawnWeight, speed);
             }
+            else if (id == "dark_green_slime")
+            {
+                TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+                monsterTemplateMap[id] = make_unique<DarkGreenSlime>(
+                    id, name, levelMin, levelMax,
+                    baseHealth, baseDamage, goldDrop, spawnWeight, speed);
+            }
             else
             {
                 TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+                // Create Monster object and add to vector
+                monstersTemplate.emplace_back(
+                    make_unique<Monster>(
+                        id, name, levelMin, levelMax,
+                        baseHealth, baseDamage, goldDrop, spawnWeight, speed));
             }
         }
         std::cout << "Successfully loaded " << monstersTemplate.size() << " monster templates from " << filePath << std::endl;

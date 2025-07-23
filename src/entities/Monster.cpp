@@ -192,29 +192,32 @@ GreenSlime::GreenSlime(
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
 }
 
-void GreenSlime::Move()
-{
-    // Implement the movement logic for Green Slime
-    // For example, it could move towards the player or randomly within a certain range
-}
-
-void GreenSlime::Attack(Entity &target)
-{
-    // Implement the attack logic for Green Slime
-    // For example, it could deal damage to the target entity
-    if (!isDead)
-    {
-        target.setHealth(target.GetHealth() - baseDamage);
-        TraceLog(LOG_INFO, "Green Slime attacks %s for %.2f damage.", target.GetName().c_str(), baseDamage);
-    }
-}
-
-// void GreenSlime::Draw()
-// {
-//     DrawTexturePro(texture, source, dest, {}, 0.0f, WHITE);
-// }
-
 // TODO: Implement other monster subclasses
 
 // ---- [Dark Green Slime] ----
+DarkGreenSlime::DarkGreenSlime(
+    const std::string &idVal,
+    const std::string &nameVal,
+    int levelMinVal,
+    int levelMaxVal,
+    float baseHealthVal,
+    float baseDamageVal,
+    int goldDropVal,
+    float spawnWeightVal,
+    float speedVal)
+    : Monster(idVal, nameVal, levelMinVal, levelMaxVal, baseHealthVal, baseDamageVal, goldDropVal, spawnWeightVal, speedVal)
+{
+    // TODO: have a proper green slime
+    Image image = LoadImage("resources/sprites/green_slime.png");
+    texture = LoadTextureFromImage(image);
+    UnloadImage(image);
+
+    source.x = 0;
+    source.y = 0;
+    source.width = (float)texture.width;
+    source.height = (float)texture.height;
+
+    std::cout << "Monster (" << nameVal << ") has been created with ID: " << idVal << std::endl;
+    std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
+}
 // ---- [White Slime] ----
