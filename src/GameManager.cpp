@@ -375,9 +375,10 @@ void GameManager::ExitState(GameState state)
 
 void GameManager::AddEntity(std::unique_ptr<Entity> entity)
 {
-    if (entity)
-    {
+    if (entity) {
         entities.push_back(entity.get());
+        // Remove nullptrs from entities
+        entities.erase(std::remove(entities.begin(), entities.end(), nullptr), entities.end());
     }
 }
 

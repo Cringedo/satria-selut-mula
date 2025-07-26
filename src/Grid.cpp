@@ -54,9 +54,8 @@ void Grid::Generate()
 
     // This is assign the tile based on the coordinate
     Vector3 temp;
-    // unique_ptr<Tile> tile = make_unique<Tile>(Rectangle{}, 0.0f, TileType::EMPTY_TILE);
-
     vector<unique_ptr<Tile>> tempTiles;
+    int safeTileCount = 0;
     for (int i = 0; i < height; i++)
     {
         tempTiles.clear();
@@ -71,27 +70,20 @@ void Grid::Generate()
             if (tile->GetNoiseValue() < SAFE_TILE_NOISE)
             {
                 tile->SetTileType(TileType::SAFE_TILE);
+                ++safeTileCount;
             }
 
             tile->SetGridCoordinate({(float)i, (float)j});
             tempTiles.push_back(move(tile));
-
         }
-        // TraceLog(LOG_INFO, "Finished processing row: %d", i);
-        // TraceLog(LOG_INFO, "Tile Count: %zu", tempTiles.size());
         tiles.push_back(move(tempTiles));
     }
 
-    // for (size_t rowIdx = 0; rowIdx < tiles.size(); ++rowIdx)
-    // {
-    //     for (size_t colIdx = 0; colIdx < tiles[rowIdx].size(); ++colIdx)
-    //     {
-    //         Tile& t = tiles[rowIdx][colIdx];
-    //         TraceLog(LOG_INFO, TextFormat("Tile Index: [%zu, %zu] - Grid: [%0.0f, %0.0f] - Noise: %0.2f",
-    //             rowIdx, colIdx, t.GetGridCoordinate().x, t.GetGridCoordinate().y, t.GetNoiseValue()));
-    //     }
-    //     TraceLog(LOG_INFO, "Finished processing row: %zu", rowIdx);
-    // }
+    // If no safe tile was generated, forcibly set at least one tile to SAFE_TILE
+    if (safeTileCount == 0 && !tiles.empty() && !tiles[0].empty()) {
+        tiles[0][0]->SetTileType(TileType::SAFE_TILE);
+        TraceLog(LOG_WARNING, "No safe tiles generated, forcibly setting [0,0] as SAFE_TILE.");
+    }
 }
 
 void Grid::PlaceEntityByGridCoordinate(Entity &entity, int i, int j)
@@ -188,18 +180,21 @@ bool Grid::CheckForTile(Vector2 coord)
 Vector2 Grid::GetRandomSafeTile()
 {
     cout << "Spawning a random safe tile..." << endl;
-    bool safeSpawn = false;
-    int randomX;
-    int randomY;
-    
-    while (!safeSpawn)
-    {
-        randomX = std::rand() % GRID_WIDTH;
-        randomY = std::rand() % GRID_HEIGHT;
-        safeSpawn = CheckForTile({(float)randomX, (float)randomY});
+    // Collect all safe tiles
+    std::vector<Vector2> safeTiles;
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            if (CheckForTile({(float)i, (float)j})) {
+                safeTiles.push_back({(float)i, (float)j});
+            }
+        }
     }
-
-    return {(float)randomX, (float)randomY};
+    if (safeTiles.empty()) {
+        TraceLog(LOG_ERROR, "No safe tiles available in grid! Returning (0,0) as fallback.");
+        return {0, 0};
+    }
+    int idx = std::rand() % safeTiles.size();
+    return safeTiles[idx];
 }
 
 Tile* Grid::GetTileByGridCoordinate(int i, int j)

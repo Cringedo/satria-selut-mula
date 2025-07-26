@@ -47,30 +47,39 @@ void TurnManager::Setup(std::vector<Entity *> initialEntities)
 {
     entities = std::move(initialEntities);
 
+    // Remove nullptrs from entities
+    entities.erase(std::remove(entities.begin(), entities.end(), nullptr), entities.end());
+
     TraceLog(LOG_INFO, "TurnManager setup with %d entities.", entities.size());
 
     std::sort(entities.begin(), entities.end(), [](Entity *a, Entity *b)
               { return a->getSpeed() > b->getSpeed(); });
 
-    if (dynamic_cast<Monster *>(entities[0]))
-    {
-        currentTurnState = TurnState::MONSTER_TURN;
-    }
-    else
-    {
-        currentTurnState = TurnState::PLAYER_TURN;
+    // Wait and retry if entities is empty
+    int retryCount = 0;
+    while (entities.empty() && retryCount < 10) {
+        TraceLog(LOG_WARNING, "TurnManager: No entities found, waiting and retrying...");
+        WaitTime(0.05f);
+        ++retryCount;
     }
 
-    SetCurrentEntity(entities.empty() ? nullptr : entities[0]);
+    if (!entities.empty()) {
+        if (dynamic_cast<Monster *>(entities[0])) {
+            currentTurnState = TurnState::MONSTER_TURN;
+        } else {
+            currentTurnState = TurnState::PLAYER_TURN;
+        }
+        SetCurrentEntity(entities[0]);
+    }
 }
 
 void TurnManager::Setup()
 {
-    WaitTime(0.1f); 
+    WaitTime(0.1f);
+    // Remove dead and nullptr entities
     entities.erase(std::remove_if(entities.begin(), entities.end(), [](Entity *entity)
                    {
-                    //    TraceLog(LOG_INFO, "Checking entity: %s with health %f (%zu)", entity->GetName().c_str(), entity->GetHealth(), entity->GetHealth() <= 0);
-                       return entity->GetHealth() <= 0;
+                       return (entity == nullptr) || (entity->GetHealth() <= 0);
                    }), entities.end());
 
     TraceLog(LOG_INFO, "TurnManager setup with %d entities after cleanup.", entities.size());
@@ -78,23 +87,34 @@ void TurnManager::Setup()
     std::sort(entities.begin(), entities.end(), [](Entity *a, Entity *b)
               { return a->getSpeed() > b->getSpeed(); });
 
-    if (dynamic_cast<Monster *>(entities[0]))
-    {
-        currentTurnState = TurnState::MONSTER_TURN;
-    }
-    else
-    {
-        currentTurnState = TurnState::PLAYER_TURN;
+    // Wait and retry if entities is empty
+    int retryCount = 0;
+    while (entities.empty() && retryCount < 10) {
+        TraceLog(LOG_WARNING, "TurnManager: No entities found after cleanup, waiting and retrying...");
+        WaitTime(0.05f);
+        ++retryCount;
     }
 
-    SetCurrentEntity(entities.empty() ? nullptr : entities[0]);
+    if (!entities.empty()) {
+        if (dynamic_cast<Monster *>(entities[0])) {
+            currentTurnState = TurnState::MONSTER_TURN;
+        } else {
+            currentTurnState = TurnState::PLAYER_TURN;
+        }
+        SetCurrentEntity(entities[0]);
+    }
 }
 
 void TurnManager::GetNextEntity()
 {
-    if (entities.empty())
-    {
-        TraceLog(LOG_WARNING, "No entities available to get next entity.");
+    int retryCount = 0;
+    while (entities.empty() && retryCount < 10) {
+        TraceLog(LOG_WARNING, "TurnManager: No entities available to get next entity, waiting and retrying...");
+        WaitTime(0.05f);
+        ++retryCount;
+    }
+    if (entities.empty()) {
+        TraceLog(LOG_ERROR, "TurnManager: Still no entities after retries. Aborting GetNextEntity.");
         return;
     }
 
