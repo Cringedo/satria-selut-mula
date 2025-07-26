@@ -29,12 +29,23 @@ GameManager::~GameManager()
     TraceLog(LOG_INFO, "GameManager: Shutting down...");
 }
 
-void GameManager::Init()
+void GameManager::Init(GameState initialState)
 {
     TraceLog(LOG_INFO, "GameManager: Initializing game systems...");
 
     LoadMonsterData("resources/data/monster.json");
 
+
+    InitializePlayerAndMonsters();
+
+    // ----- Turn Manager Initialization -------
+    turnManager.Setup(entities);
+
+    ChangeState(initialState);
+}
+
+void GameManager::InitializePlayerAndMonsters()
+{
     // ----- Player and Grid Initialization -------
     playerPtr = std::make_unique<Player>(0, 0, "PlayerOne", 5.0f);
     gridPtr = std::make_unique<Grid>(GRID_HEIGHT, GRID_WIDTH);
@@ -62,11 +73,6 @@ void GameManager::Init()
 
         entities.push_back(monster.get());
     }
-
-    // ----- Turn Manager Initialization -------
-    turnManager.Setup(entities);
-
-    ChangeState(GameState::MENU);
 }
 
 void GameManager::Update(float dt)
@@ -135,6 +141,12 @@ void GameManager::Update(float dt)
             turnManager.GetNextEntity();
         }
 
+        if (IsKeyPressed(KEY_V))
+        {
+            ChangeState(GameState::MENU);
+        }
+
+        // Change the level layout
         if (IsKeyPressed(KEY_Z))
         {
             gridPtr->Generate();
@@ -148,12 +160,22 @@ void GameManager::Update(float dt)
                 gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
             }
         }
+
+        if (IsKeyPressed(KEY_R))
+        {
+            Shutdown();
+            WaitTime(0.5f);
+            Init(GameState::PLAYING);
+        }
+
         PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); // Keep global in sync
 
-        // Check for game over condition
-        // if (playerPtr->IsDead()) ChangeState(GameState::GAMEOVER);
         if (IsKeyPressed(KEY_P))
-            ChangeState(GameState::PAUSED); // Example pause
+        ChangeState(GameState::PAUSED); // Example pause
+        
+        // TODO: Player death
+        // if (playerPtr->IsDead()) ChangeState(GameState::GAMEOVER);
+        
         break;
     case GameState::PAUSED:
         // Update pause menu logic, check for resume or quit
@@ -232,6 +254,11 @@ void GameManager::Draw()
 
 void GameManager::Shutdown()
 {
+    playerPtr.reset();
+    gridPtr.reset();
+    monstersPtr.clear();
+    entities.clear();
+    monsterTemplateMap.clear();
     TraceLog(LOG_INFO, "GameManager: Shutting down game systems...");
 }
 

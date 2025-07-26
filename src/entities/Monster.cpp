@@ -137,9 +137,6 @@ void Monster::SetPosition(float x, float y)
 {
     position = {x, y};
     // SetGridCoordinate(position);
-
-    cout << "Test: " << x << "," << y << endl;
-
     dest = {x, y, SCALE, SCALE};
 }
 
@@ -166,7 +163,9 @@ void Monster::Draw()
         // If the monster's health is zero or less, it should not be drawn
         return;
     }
+
     
+    DrawText(TextFormat("%s: %0.f", GetName().c_str(), GetHealth()), dest.x, dest.y - 20, 10, RED);
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
 

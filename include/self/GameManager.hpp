@@ -17,6 +17,7 @@ enum class GameState
     PAUSED,
     GAMEOVER,
     LOADING,
+    INTIALIZING
 };
 
 class GameManager
@@ -27,7 +28,7 @@ public:
     GameManager(const GameManager &) = delete;
     GameManager &operator=(const GameManager &) = delete;
 
-    void Init();
+    void Init(GameState initialState);
     void Update(float dt);
     void Draw();
     void Shutdown();
@@ -65,4 +66,6 @@ private:
     void DrawEntities(const std::vector<Entity *> &entities);
 
     void DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEntities);
+
+    void InitializePlayerAndMonsters();
 };
