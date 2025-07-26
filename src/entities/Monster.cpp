@@ -5,6 +5,9 @@
 #include <iostream>
 #include <algorithm>
 
+// --- Target Setter/Getter (now in Entity) ---
+
+
 Monster::Monster(
     const std::string &idVal,
     const std::string &nameVal,
@@ -165,8 +168,9 @@ void Monster::Draw()
         return;
     }
 
-    
-    DrawText(TextFormat("%s: %0.f", GetName().c_str(), GetHealth()), dest.x, dest.y - 20, 10, RED);
+    int fontSize = 20;
+    DrawText(TextFormat("%s: %0.f", GetName().c_str(), GetHealth()), dest.x, dest.y - 10, fontSize, RED);
+    DrawText(TextFormat("Coordinate: (%.2f, %.2f)", GetGridCoordinate().x, GetGridCoordinate().y), dest.x, dest.y + 10, fontSize, RED);
     DrawTexturePro(texture, source, dest, {}, 0.0f, RED);
 }
 

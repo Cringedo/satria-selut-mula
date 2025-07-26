@@ -1,3 +1,4 @@
+
 #include <raylib.h>
 #include <iostream>
 
@@ -91,4 +92,12 @@ void Entity::SetGridPosition(float x, float y)
 void Entity::SetGridPosition(Vector2 coord)
 {
     gridCoordinate = coord;
+}
+
+void Entity::SetTarget(Entity* target) {
+    Target = target;
+}
+
+Entity* Entity::GetTarget() const {
+    return Target;
 }

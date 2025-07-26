@@ -42,6 +42,10 @@ public:
     virtual Vector2 GetGridCoordinate() const;
     Vector2 GetPosition() const;
 
+    // ---- [Target] ----
+    void SetTarget(Entity* target);
+    Entity* GetTarget() const;
+
     // ---- [Interface] ----
 
     // ---- [Drawing] ----
@@ -63,6 +67,8 @@ protected:
     Rectangle dest;
     Texture2D texture;
     Rectangle source;
+
+    Entity* Target = nullptr;
 };
 
 class Player : public Entity
