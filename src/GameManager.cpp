@@ -94,10 +94,13 @@ void GameManager::Update(float dt)
             ChangeState(GameState::PLAYING);
         }
         break;
-    case GameState::PLAYING:
 
+
+        case GameState::PLAYING:
+        
         // TODO: we can have this to be based on the player movement speed
-
+        
+        // ---- [🌟Turn Management] -----------------
         switch (turnManager.GetCurrentTurnState())
         {
         case TurnState::CALCULATE_TURN:
@@ -112,7 +115,7 @@ void GameManager::Update(float dt)
             {
                 Monster *currentMonsterPtr = dynamic_cast<Monster *>(turnManager.GetCurrentEntity());
                 currentMonsterPtr->TakeAction();
-                turnManager.EndTurn();
+                turnManager.GetNextEntity();
             }
             else
             {
@@ -122,6 +125,7 @@ void GameManager::Update(float dt)
 
         case TurnState::PLAYER_TURN:
             turnManager.SetCurrentEntity(playerPtr.get());
+            // TODO: Remap this into a UI-based movement instead
             if (IsKeyPressed(KEY_RIGHT))
                 MovePlayer(1, 0);
             if (IsKeyPressed(KEY_LEFT))

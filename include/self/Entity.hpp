@@ -1,6 +1,7 @@
 #pragma once
 
 #include <self/GameObject.hpp>
+#include <self/MonsterActionStrategy.hpp>
 
 #include <raylib.h>
 #include <string>
@@ -85,7 +86,7 @@ protected:
 };
 
 // ------- [Monsters] -------
-class Monster : public Entity
+class Monster : public Entity, public AggressiveActionStrategy
 {
 public:
     Monster(

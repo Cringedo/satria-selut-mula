@@ -24,6 +24,7 @@ void TurnManager::StartTurn()
     }
 }
 
+
 void TurnManager::EndTurn()
 {
     if (currentTurnState == TurnState::PLAYER_TURN)
@@ -65,9 +66,10 @@ void TurnManager::Setup(std::vector<Entity *> initialEntities)
 
 void TurnManager::Setup()
 {
+    WaitTime(0.1f); 
     entities.erase(std::remove_if(entities.begin(), entities.end(), [](Entity *entity)
                    {
-                       TraceLog(LOG_INFO, "Checking entity: %s with health %f (%zu)", entity->GetName().c_str(), entity->GetHealth(), entity->GetHealth() <= 0);
+                    //    TraceLog(LOG_INFO, "Checking entity: %s with health %f (%zu)", entity->GetName().c_str(), entity->GetHealth(), entity->GetHealth() <= 0);
                        return entity->GetHealth() <= 0;
                    }), entities.end());
 
@@ -106,7 +108,7 @@ void TurnManager::GetNextEntity()
             {
                 it = entities.begin();
                 SetCurrentTurnState(TurnState::CALCULATE_TURN);
-                TraceLog(LOG_INFO, "Calculating next entity.");
+                // TraceLog(LOG_INFO, "Calculating next entity.");
             }
             else
             {
@@ -123,12 +125,12 @@ void TurnManager::GetNextEntity()
     {
         currentEntity = entities.front();
         SetCurrentTurnState(TurnState::CALCULATE_TURN);
-        TraceLog(LOG_INFO, "Calculating next entity.");
+        // TraceLog(LOG_INFO, "Calculating next entity.");
     }
 
     if (GetCurrentTurnState() == TurnState::CALCULATE_TURN)
     {
-        TraceLog(LOG_INFO, "Calculating next entity based on speed.");
+        // TraceLog(LOG_INFO, "Calculating next entity based on speed.");
         Setup();
     }
 

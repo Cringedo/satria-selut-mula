@@ -1,5 +1,6 @@
 #include <self/Entity.hpp>
 #include <self/Constant.h>
+#include <self/MonsterActionStrategy.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -202,6 +203,9 @@ void GreenSlime::TakeAction()
     // Implement specific action logic for Green Slime
     // For example, move towards the player or attack
     TraceLog(LOG_INFO, "Green Slime %s is taking action.", GetName().c_str());
+
+    GreenSlime::Execute(*this); 
+    
 }
 
 // TODO: Implement other monster subclasses
@@ -238,5 +242,6 @@ void DarkGreenSlime::TakeAction()
     // Implement specific action logic for Dark Green Slime
     // For example, move towards the player or attack
     TraceLog(LOG_INFO, "Dark Green Slime %s is taking action.", GetName().c_str());
+    DarkGreenSlime::Execute(*this);
 }
 // ---- [White Slime] ----
