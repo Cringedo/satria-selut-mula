@@ -7,7 +7,10 @@
 #include <string>
 #include <memory>
 
+
 using namespace std;
+
+class Grid;
 
 class Entity : public GameObject
 {
@@ -124,7 +127,7 @@ public:
 
     // ---- [Action Logic] ----
     // TODO: START HERE FOR THE LOGIC
-    virtual void TakeAction() = 0;
+    virtual void TakeAction(Grid* grid) = 0;
 
     // ---- [Position and Grid Coordinate] ----
     // Override to provide specific behavior for monsters
@@ -163,7 +166,7 @@ public:
                float speedVal);
 
 private:
-    void TakeAction() override;
+    void TakeAction(Grid* grid) override;
 };
 
 // ------- [Dark Green Slime] --------
@@ -182,5 +185,5 @@ public:
                    float speedVal);
 
 private:
-    void TakeAction() override;
+    void TakeAction(Grid* grid) override;
 };

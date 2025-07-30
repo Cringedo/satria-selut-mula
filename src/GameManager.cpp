@@ -69,6 +69,10 @@ void GameManager::InitializePlayerAndMonsters()
     {
         TraceLog(LOG_INFO, "[GameManager]: Spawning monster %s", monster->GetName().c_str());
         monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
+
+        // FIXME: Proper way to get the target
+        monster->SetTarget(playerPtr.get());
+
         gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
 
         entities.push_back(monster.get());
@@ -114,7 +118,7 @@ void GameManager::Update(float dt)
             if (turnManager.GetCurrentEntity())
             {
                 Monster *currentMonsterPtr = dynamic_cast<Monster *>(turnManager.GetCurrentEntity());
-                currentMonsterPtr->TakeAction();
+                currentMonsterPtr->TakeAction(gridPtr.get());
                 turnManager.GetNextEntity();
             }
             else

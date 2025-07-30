@@ -1,6 +1,7 @@
 #include <self/Entity.hpp>
 #include <self/Constant.h>
 #include <self/MonsterActionStrategy.hpp>
+#include <self/Grid.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -119,9 +120,10 @@ float Monster::calculateHealthAtLevel(int level) const
     return baseHealth + (clampedLevel - levelMin) * 10.0f;
 }
 
-void Monster::TakeAction()
+void Monster::TakeAction(Grid* grid)
 {
     TraceLog(LOG_INFO, "Monster %s is taking action.", name.c_str());
+    // Default implementation does nothing with grid
 }
 
 
@@ -202,14 +204,14 @@ GreenSlime::GreenSlime(
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
 }
 
-void GreenSlime::TakeAction()
+void GreenSlime::TakeAction(Grid* grid)
 {
     // Implement specific action logic for Green Slime
     // For example, move towards the player or attack
     TraceLog(LOG_INFO, "Green Slime %s is taking action.", GetName().c_str());
 
-    GreenSlime::Execute(*this); 
-    
+    MonsterAction action = GreenSlime::Execute(*this); // You can now use grid if needed
+    grid->PlaceMonsterByGridCoordinate(*this, action.position.x, action.position.y); // Assuming grid has a method to perform actions
 }
 
 // TODO: Implement other monster subclasses
@@ -241,11 +243,11 @@ DarkGreenSlime::DarkGreenSlime(
     std::cout << texture.id << " - " << texture.width << "x" << texture.height << std::endl;
 }
 
-void DarkGreenSlime::TakeAction()
+void DarkGreenSlime::TakeAction(Grid* grid)
 {
     // Implement specific action logic for Dark Green Slime
     // For example, move towards the player or attack
     TraceLog(LOG_INFO, "Dark Green Slime %s is taking action.", GetName().c_str());
-    DarkGreenSlime::Execute(*this);
+    DarkGreenSlime::Execute(*this); // You can now use grid if needed
 }
 // ---- [White Slime] ----
