@@ -45,6 +45,8 @@ void TurnManager::EndTurn()
 
 void TurnManager::Setup(std::vector<Entity *> initialEntities)
 {
+    entities.clear();
+
     entities = std::move(initialEntities);
 
     // Remove nullptrs from entities

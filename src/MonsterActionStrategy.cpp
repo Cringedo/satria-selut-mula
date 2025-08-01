@@ -1,9 +1,18 @@
 
 #include <self/MonsterActionStrategy.hpp>
 #include <self/Entity.hpp>
+#include <self/Grid.hpp>
 
 #include <raylib.h> 
+#include <vector>
 
+Vector2 A_Star(){
+
+    vector<Tile*> path;
+
+
+
+}
 
 MonsterAction AggressiveActionStrategy::Execute(Entity &entity) {
     if(!IsApplicable(entity)) {
@@ -42,6 +51,7 @@ bool AggressiveActionStrategy::IsApplicable(const Entity &entity) const {
 
     TraceLog(LOG_INFO, "Entity %s is applicable for aggressive action.", entity.GetName().c_str());
 
+    // A_Star();
 
 
         
