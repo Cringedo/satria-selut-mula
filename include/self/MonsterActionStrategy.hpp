@@ -2,6 +2,8 @@
 
 #include <self/Constant.h>  
 #include <raylib.h>
+#include <string>
+#include <iostream>
 
 class Entity;
 
@@ -16,6 +18,21 @@ struct MonsterAction {
     MonsterActionType type;
     Entity *target; 
     Vector2 position; 
+
+    std::string ToString() const {
+        switch (type) {
+            case MonsterActionType::ATTACK:
+                return "Attack";
+            case MonsterActionType::MOVE:
+                return "Move";
+            case MonsterActionType::DEFEND:
+                return "Defend";
+            case MonsterActionType::NEUTRAL:
+                return "Neutral";
+            default:
+                return "Unknown Action";
+        }
+    }
 };
 
 class MonsterActionStrategy {

@@ -208,9 +208,9 @@ void GreenSlime::TakeAction(Grid* grid)
 {
     // Implement specific action logic for Green Slime
     // For example, move towards the player or attack
-    TraceLog(LOG_INFO, "Green Slime %s is taking action.", GetName().c_str());
-
+    
     MonsterAction action = GreenSlime::Execute(*this); // You can now use grid if needed
+    TraceLog(LOG_INFO, "Green Slime %s is taking action: %s", GetName().c_str(), action.ToString().c_str());
     grid->PlaceMonsterByGridCoordinate(*this, action.position.x, action.position.y); // Assuming grid has a method to perform actions
 }
 
@@ -247,7 +247,8 @@ void DarkGreenSlime::TakeAction(Grid* grid)
 {
     // Implement specific action logic for Dark Green Slime
     // For example, move towards the player or attack
-    TraceLog(LOG_INFO, "Dark Green Slime %s is taking action.", GetName().c_str());
+    MonsterAction action = DarkGreenSlime::Execute(*this);
+    TraceLog(LOG_INFO, "Dark Green Slime %s is taking action: %s", GetName().c_str(), action.ToString().c_str());
     DarkGreenSlime::Execute(*this); // You can now use grid if needed
 }
 // ---- [White Slime] ----
