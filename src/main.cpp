@@ -11,7 +11,7 @@ int main()
     SetTargetFPS(60);
 
     // Initialize the GameManager
-    GameManager::GetInstance().Init();
+    GameManager::GetInstance().Init(GameState::MENU);
 
     // Main game loop
     while (!w.ShouldClose())

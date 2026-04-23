@@ -1,0 +1,196 @@
+#include <self/TurnManager.hpp>
+
+#include <algorithm>
+#include <iostream>
+
+TurnManager::TurnManager()
+{
+    std::cout << "TurnManager initialized." << std::endl;
+}
+
+void TurnManager::StartTurn()
+{
+    if (currentTurnState == TurnState::PLAYER_TURN)
+    {
+        TraceLog(LOG_INFO, "Starting player turn.");
+    }
+    else if (currentTurnState == TurnState::MONSTER_TURN)
+    {
+        TraceLog(LOG_INFO, "Starting monster turn.");
+    }
+    else
+    {
+        TraceLog(LOG_WARNING, "Unknown turn state. Cannot start turn.");
+    }
+}
+
+
+void TurnManager::EndTurn()
+{
+    if (currentTurnState == TurnState::PLAYER_TURN)
+    {
+        TraceLog(LOG_INFO, "Ending player turn.");
+        currentTurnState = TurnState::MONSTER_TURN;
+    }
+    else if (currentTurnState == TurnState::MONSTER_TURN)
+    {
+        TraceLog(LOG_INFO, "Ending monster turn.");
+        currentTurnState = TurnState::PLAYER_TURN;
+    }
+    else
+    {
+        TraceLog(LOG_WARNING, "Unknown turn state. Cannot end turn.");
+    }
+}
+
+void TurnManager::Setup(std::vector<Entity *> initialEntities)
+{
+    entities.clear();
+
+    entities = std::move(initialEntities);
+
+    // Remove nullptrs from entities
+    entities.erase(std::remove(entities.begin(), entities.end(), nullptr), entities.end());
+
+    TraceLog(LOG_INFO, "TurnManager setup with %d entities.", entities.size());
+
+    std::sort(entities.begin(), entities.end(), [](Entity *a, Entity *b)
+              { return a->getSpeed() > b->getSpeed(); });
+
+    // Wait and retry if entities is empty
+    int retryCount = 0;
+    while (entities.empty() && retryCount < 10) {
+        TraceLog(LOG_WARNING, "TurnManager: No entities found, waiting and retrying...");
+        WaitTime(0.05f);
+        ++retryCount;
+    }
+
+    if (!entities.empty()) {
+        if (dynamic_cast<Monster *>(entities[0])) {
+            currentTurnState = TurnState::MONSTER_TURN;
+        } else {
+            currentTurnState = TurnState::PLAYER_TURN;
+        }
+        SetCurrentEntity(entities[0]);
+    }
+}
+
+void TurnManager::Setup()
+{
+    WaitTime(0.1f);
+    // Remove dead and nullptr entities
+    entities.erase(std::remove_if(entities.begin(), entities.end(), [](Entity *entity)
+                   {
+                       return (entity == nullptr) || (entity->GetHealth() <= 0);
+                   }), entities.end());
+
+    TraceLog(LOG_INFO, "TurnManager setup with %d entities after cleanup.", entities.size());
+
+    std::sort(entities.begin(), entities.end(), [](Entity *a, Entity *b)
+              { return a->getSpeed() > b->getSpeed(); });
+
+    // Wait and retry if entities is empty
+    int retryCount = 0;
+    while (entities.empty() && retryCount < 10) {
+        TraceLog(LOG_WARNING, "TurnManager: No entities found after cleanup, waiting and retrying...");
+        WaitTime(0.05f);
+        ++retryCount;
+    }
+
+    if (!entities.empty()) {
+        if (dynamic_cast<Monster *>(entities[0])) {
+            currentTurnState = TurnState::MONSTER_TURN;
+        } else {
+            currentTurnState = TurnState::PLAYER_TURN;
+        }
+        SetCurrentEntity(entities[0]);
+    }
+}
+
+void TurnManager::GetNextEntity()
+{
+    int retryCount = 0;
+    while (entities.empty() && retryCount < 10) {
+        TraceLog(LOG_WARNING, "TurnManager: No entities available to get next entity, waiting and retrying...");
+        WaitTime(0.05f);
+        ++retryCount;
+    }
+    if (entities.empty()) {
+        TraceLog(LOG_ERROR, "TurnManager: Still no entities after retries. Aborting GetNextEntity.");
+        return;
+    }
+
+    if (currentEntity)
+    {
+        auto it = std::find(entities.begin(), entities.end(), currentEntity);
+        if (it != entities.end())
+        {
+            ++it;
+            if (it == entities.end())
+            {
+                it = entities.begin();
+                SetCurrentTurnState(TurnState::CALCULATE_TURN);
+                // TraceLog(LOG_INFO, "Calculating next entity.");
+            }
+            else
+            {
+                currentEntity = *it;
+            }
+        }
+        else
+        {
+            TraceLog(LOG_WARNING, "Current entity not found in the list.");
+            currentEntity = entities.front();
+        }
+    }
+    else
+    {
+        currentEntity = entities.front();
+        SetCurrentTurnState(TurnState::CALCULATE_TURN);
+        // TraceLog(LOG_INFO, "Calculating next entity.");
+    }
+
+    if (GetCurrentTurnState() == TurnState::CALCULATE_TURN)
+    {
+        // TraceLog(LOG_INFO, "Calculating next entity based on speed.");
+        Setup();
+    }
+
+    if (dynamic_cast<const Player *>(currentEntity))
+    {
+        currentTurnState = TurnState::PLAYER_TURN;
+    }
+    else if (dynamic_cast<const Monster *>(currentEntity))
+    {
+        currentTurnState = TurnState::MONSTER_TURN;
+    }
+    else
+    {
+        TraceLog(LOG_WARNING, "Current entity is neither Player nor Monster.");
+    }
+
+    TraceLog(LOG_INFO, "Next entity is: %s", currentEntity->GetName().c_str());
+}
+
+void TurnManager::DisplayTurnOrder() const
+{
+    int yOffset = 10;
+    int gap = 30;
+
+    DrawText(TextFormat("Current Order: %s (%s)", currentTurnState == TurnState::PLAYER_TURN ? "Player" : "Monster", currentEntity ? currentEntity->GetName().c_str() : "None", currentEntity->GetName().c_str()), 10, yOffset, 20, BLACK);
+    // DrawText(TextFormat("Entity: %s", currentEntity->GetName().c_str()), 10, yOffset+10, 20, BLACK);
+    // DrawText(TextFormat("Entity: %s", dynamic_cast<Monster *>(currentEntity) ? currentEntity->GetName().c_str() : dynamic_cast<Player *>(currentEntity) ? currentEntity->GetName().c_str() : "None"), 10, yOffset+10, 20, BLACK);
+
+    yOffset += 30;
+
+    for (size_t i = 0; i < entities.size(); ++i)
+    {
+        Entity *entity = entities[i];
+        if (!entity)
+            continue;
+
+        // FIXME: currently I don't know which speed are we using properly - is it the entity or children classes?
+        DrawText(TextFormat("%zu: %s [Health: %f, Speed: %.2f]", i, entity->GetName().c_str(), entity->GetHealth(), entity->getSpeed()),
+                 10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
+    }
+}

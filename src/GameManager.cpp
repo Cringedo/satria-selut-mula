@@ -29,14 +29,25 @@ GameManager::~GameManager()
     TraceLog(LOG_INFO, "GameManager: Shutting down...");
 }
 
-void GameManager::Init()
+void GameManager::Init(GameState initialState)
 {
     TraceLog(LOG_INFO, "GameManager: Initializing game systems...");
 
     LoadMonsterData("resources/data/monster.json");
 
+
+    InitializePlayerAndMonsters();
+
+    // ----- Turn Manager Initialization -------
+    turnManager.Setup(entities);
+
+    ChangeState(initialState);
+}
+
+void GameManager::InitializePlayerAndMonsters()
+{
     // ----- Player and Grid Initialization -------
-    playerPtr = std::make_unique<Player>(0, 0, "PlayerOne");
+    playerPtr = std::make_unique<Player>(0, 0, "PlayerOne", 5.0f);
     gridPtr = std::make_unique<Grid>(GRID_HEIGHT, GRID_WIDTH);
     gridPtr->Generate();
 
@@ -44,22 +55,28 @@ void GameManager::Init()
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, playerSpawnCoordinate.x, playerSpawnCoordinate.y);
     PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate();
 
+    entities.push_back(playerPtr.get());
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // ----- Mobs Spawn -------
     // TODO: do the proper spawning rate based on the player level
     Vector2 monsterSpawnCoordinate;
 
-    // Temp: just spawn 2 monsters
-    monstersPtr.emplace_back(move(monstersTemplate[0]));
-    monstersPtr.emplace_back(move(monstersTemplate[1]));
+    // TODO: just spawn 2 monsters
+    monstersPtr.emplace_back(move(monsterTemplateMap["green_slime"]));
+    monstersPtr.emplace_back(move(monsterTemplateMap["dark_green_slime"]));
     for (unique_ptr<Monster> &monster : monstersPtr)
     {
+        TraceLog(LOG_INFO, "[GameManager]: Spawning monster %s", monster->GetName().c_str());
         monsterSpawnCoordinate = gridPtr->GetRandomSafeTile();
-        gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
-    }
 
-    ChangeState(GameState::MENU);
+        // FIXME: Proper way to get the target
+        monster->SetTarget(playerPtr.get());
+
+        gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
+
+        entities.push_back(monster.get());
+    }
 }
 
 void GameManager::Update(float dt)
@@ -77,16 +94,67 @@ void GameManager::Update(float dt)
         // Update menu elements, check for menu selections
         if (IsKeyPressed(KEY_ENTER))
         {
+
             ChangeState(GameState::PLAYING);
         }
         break;
-    case GameState::PLAYING:
-        // TODO: we can have this to be based on the player movement speed
-        if (IsKeyPressed(KEY_RIGHT)) MovePlayer(1, 0);
-        if (IsKeyPressed(KEY_LEFT))  MovePlayer(-1, 0);
-        if (IsKeyPressed(KEY_UP))    MovePlayer(0, 1);
-        if (IsKeyPressed(KEY_DOWN))  MovePlayer(0, -1);
 
+
+        case GameState::PLAYING:
+        
+        // TODO: we can have this to be based on the player movement speed
+        
+        // ---- [🌟Turn Management] -----------------
+        switch (turnManager.GetCurrentTurnState())
+        {
+        case TurnState::CALCULATE_TURN:
+            turnManager.StartTurn();
+            turnManager.SetCurrentEntity(nullptr);
+
+            break;
+
+        case TurnState::MONSTER_TURN:
+            // turnManager.GetNextEntity();
+            if (turnManager.GetCurrentEntity())
+            {
+                Monster *currentMonsterPtr = dynamic_cast<Monster *>(turnManager.GetCurrentEntity());
+                currentMonsterPtr->TakeAction(gridPtr.get());
+                turnManager.GetNextEntity();
+            }
+            else
+            {
+                TraceLog(LOG_WARNING, "No current entity to take action.");
+            }
+            break;
+
+        case TurnState::PLAYER_TURN:
+            turnManager.SetCurrentEntity(playerPtr.get());
+            // TODO: Remap this into a UI-based movement instead
+            if (IsKeyPressed(KEY_RIGHT))
+                MovePlayer(1, 0);
+            if (IsKeyPressed(KEY_LEFT))
+                MovePlayer(-1, 0);
+            if (IsKeyPressed(KEY_UP))
+                MovePlayer(0, 1);
+            if (IsKeyPressed(KEY_DOWN))
+                MovePlayer(0, -1);
+            break;
+
+        default:
+            break;
+        }
+
+        if (IsKeyPressed(KEY_B))
+        {
+            turnManager.GetNextEntity();
+        }
+
+        if (IsKeyPressed(KEY_V))
+        {
+            ChangeState(GameState::MENU);
+        }
+
+        // Change the level layout
         if (IsKeyPressed(KEY_Z))
         {
             gridPtr->Generate();
@@ -100,11 +168,22 @@ void GameManager::Update(float dt)
                 gridPtr->PlaceMonsterByGridCoordinate(*monster, monsterSpawnCoordinate.x, monsterSpawnCoordinate.y);
             }
         }
+
+        if (IsKeyPressed(KEY_R))
+        {
+            Shutdown();
+            WaitTime(0.5f);
+            Init(GameState::PLAYING);
+        }
+
         PLAYER_GRID_COORDINATE = playerPtr->GetGridCoordinate(); // Keep global in sync
 
-        // Check for game over condition
+        if (IsKeyPressed(KEY_P))
+        ChangeState(GameState::PAUSED); // Example pause
+        
+        // TODO: Player death
         // if (playerPtr->IsDead()) ChangeState(GameState::GAMEOVER);
-        if (IsKeyPressed(KEY_P)) ChangeState(GameState::PAUSED); // Example pause
+        
         break;
     case GameState::PAUSED:
         // Update pause menu logic, check for resume or quit
@@ -145,6 +224,7 @@ void GameManager::Draw()
               });
 
     DisplayDrawEntityOrder(drawableEntities);
+    turnManager.DisplayTurnOrder();
 
     // Drawing logic based on current state
     switch (currentState)
@@ -158,13 +238,13 @@ void GameManager::Draw()
         break;
     case GameState::PLAYING:
         gridPtr->Draw();
-        
+
         // Draw player and monsters based on their grid coordinates
         DrawEntities(drawableEntities);
-        
+
         break;
-        
-        case GameState::PAUSED:
+
+    case GameState::PAUSED:
         gridPtr->Draw();
         DrawEntities(drawableEntities);
 
@@ -182,6 +262,11 @@ void GameManager::Draw()
 
 void GameManager::Shutdown()
 {
+    playerPtr.reset();
+    gridPtr.reset();
+    monstersPtr.clear();
+    entities.clear();
+    monsterTemplateMap.clear();
     TraceLog(LOG_INFO, "GameManager: Shutting down game systems...");
 }
 
@@ -226,20 +311,28 @@ bool GameManager::LoadMonsterData(const string &filePath)
             float baseDamage = monsterJson.at("baseDamage").get<float>();
             int goldDrop = monsterJson.at("goldDrop").get<int>();
             float spawnWeight = monsterJson.at("spawnWeight").get<float>();
-
-            // Create Monster object and add to vector
-            monstersTemplate.emplace_back(
-                make_unique<Monster>(
-                    id, name, levelMin, levelMax,
-                    baseHealth, baseDamage, goldDrop, spawnWeight));
-
-            // monstersTemplate.emplace_back(
-            //     id, name, levelMin, levelMax,
-            //     baseHealth, baseDamage, goldDrop, spawnWeight
-            // );
+            float speed = monsterJson.value("speed", 1.0f); // Default speed if not provided
 
             // Store a pointer to the newly added template monster
-            monsterTemplateMap[id] = &monstersTemplate.back();
+            if (id == "green_slime")
+            {
+                TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+                monsterTemplateMap[id] = make_unique<GreenSlime>(
+                    id, name, levelMin, levelMax,
+                    baseHealth, baseDamage, goldDrop, spawnWeight, speed);
+            }
+            else if (id == "dark_green_slime")
+            {
+                TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+                monsterTemplateMap[id] = make_unique<DarkGreenSlime>(
+                    id, name, levelMin, levelMax,
+                    baseHealth, baseDamage, goldDrop, spawnWeight, speed);
+            }
+            else
+            {
+                TraceLog(LOG_INFO, "GameManager: Loaded monster template: %s", id.c_str());
+                // Create Monster object and add to vector
+            }
         }
         std::cout << "Successfully loaded " << monstersTemplate.size() << " monster templates from " << filePath << std::endl;
         return true;
@@ -284,9 +377,18 @@ void GameManager::ExitState(GameState state)
     }
 }
 
+void GameManager::AddEntity(std::unique_ptr<Entity> entity)
+{
+    if (entity) {
+        entities.push_back(entity.get());
+        // Remove nullptrs from entities
+        entities.erase(std::remove(entities.begin(), entities.end(), nullptr), entities.end());
+    }
+}
+
 void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEntities)
 {
-    int yOffset = 200; 
+    int yOffset = 200;
     int gap = 20;
 
     DrawText("Entity Draw Order:", 10, yOffset - 30, 20, BLACK);
@@ -294,14 +396,26 @@ void GameManager::DisplayDrawEntityOrder(const std::vector<Entity *> &drawableEn
     for (size_t i = 0; i < drawableEntities.size(); ++i)
     {
         const Entity *entity = drawableEntities[i];
-        DrawText(TextFormat("%zu: %s", i, entity->GetName().c_str()),
+
+        // FIXME: instead of using children class, we could perhaps have it to be wrapped into only the parent class, Entity for the properties
+        // Check if the entity is a Player or Monster
+        if (dynamic_cast<const Monster *>(entity))
+        {
+            const Monster *monster = static_cast<const Monster *>(entity);
+            DrawText(TextFormat("%zu: %s [%0.f] | Speed: [%0.f]", i, monster->GetName().c_str(), monster->GetHealth(), monster->getSpeed()),
+                     10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
+
+            continue;
+        }
+
+        DrawText(TextFormat("%zu: %s [%0.f]", i, entity->GetName().c_str(), entity->GetHealth(), entity->getSpeed()),
                  10, yOffset + static_cast<int>(i) * gap, 20, BLACK);
     }
 }
 
-void GameManager::DrawEntities(const std::vector<Entity*>& entities)
+void GameManager::DrawEntities(const std::vector<Entity *> &entities)
 {
-    for (Entity* entity : entities)
+    for (Entity *entity : entities)
     {
         entity->Draw();
     }
@@ -314,10 +428,9 @@ void GameManager::MovePlayer(int dx, int dy)
     if (coord.x + dx < 0 || coord.x + dx >= gridPtr->GetSize().first ||
         coord.y + dy < 0 || coord.y + dy >= gridPtr->GetSize().second)
     {
-        return; 
+        return;
     }
 
-    
-
     gridPtr->PlacePlayerByGridCoordinate(*playerPtr, coord.x + dx, coord.y + dy);
-} 
+    turnManager.GetNextEntity();
+}

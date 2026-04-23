@@ -1,5 +1,9 @@
-include
+
 lib
 bin
 .idea
 .DS_Store
+
+include/*
+vendor
+!include/self/

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity(n) 
+Player::Player(float x, float y, string n, float s) : position({x, y}), Entity(n, s) 
 {
     TraceLog(LOG_INFO, "Player (%s) has been created at [%0.0f, %0.0f]", n, position.x, position.y);
     Image image = LoadImage("resources/sprites/player_template.png");
@@ -27,7 +27,9 @@ Player::Player(float x, float y, string n) : position({x, y}), name(n), Entity(n
 
     setRange(1);
     setHealth(5);
-    setDamage(1);
+    setDamage(10);
+    setSpeed(s); 
+    // SetActionPoints(1);
 }
 
 void Player::SetGridPosition(float x, float y)
